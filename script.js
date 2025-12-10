@@ -36,21 +36,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // タグが見つかったときの処理
+   // タグが見つかったときの処理
     function handleTagFound(id) {
         const box = document.getElementById(`box-${id}`);
         
-        // すでに埋まっている場合
+        // すでに埋まっている場合（2回目以降のタッチや、戻ってきた時）
         if (box.classList.contains('filled')) {
-            // ★ここ重要：まだ処理中ではない場合のみ、解説へ飛ぶ
-            // （＝ユーザーが改めてタッチした場合だけ飛ぶ）
+            // まだ処理中（直前のスキャンから連鎖している）なら無視
+            if (isProcessing) return;
+
+            // ユーザーが意図的にタップした、または改めてスキャンした場合は移動
             window.location.href = `detail.html?id=${id}`;
             return;
         }
 
         // --- ここから新しいタグの登録処理 ---
         
-        // ★重要：フラグをONにする（「今忙しいから他の読み取りは無視して！」）
+        // フラグをON（連打防止）
         isProcessing = true;
 
         // 1. 画像を表示
@@ -61,17 +63,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // 2. 状態を保存
         saveState(id);
 
-        // 3. クリックイベント設定
-        box.onclick = () => {
-            window.location.href = `detail.html?id=${id}`;
-        };
+        // 【修正箇所】ここで box.onclick を設定しない！
+        // （アニメーション中に指が触れて誤作動するのを防ぐため）
 
         // コンプリート判定
         const collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
-        console.log("現在の個数:", collected.length); 
-
-        // 9個以上ならコンプリート演出
+        
         if (collected.length >= 9) {
+            // コンプリート時は自動で飛ばないので、ここで初めてクリック移動を有効にする
+            // (ただし、ボタンの方で移動させるなら、画像自体のクリックは無効のままでもOK)
             const overlay = document.getElementById('complete-overlay');
             overlay.classList.remove('hidden');
 
@@ -80,8 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = `detail.html?id=${id}`;
             };
             
-            // コンプリート時は自動遷移しないので、少し待ったらフラグを解除してもいいが、
-            // 基本的にこの画面で止まるので何もしなくてOK
             return; 
         }
 
@@ -89,7 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1.5秒後に自動で飛ぶ
         setTimeout(() => {
             window.location.href = `detail.html?id=${id}`;
-            // ページ遷移するのでフラグをfalseに戻す必要はない
         }, 1500);
     }
 

@@ -21,7 +21,7 @@ body {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    
+
     border: 2px solid #bbb;
     border-radius: 8px;
     display: flex;
@@ -62,4 +62,8 @@ button {
     color: #fff;
     border: none;
     border-radius: 5px;
+}
+
+.filled{
+    cursor: pointer;
 }

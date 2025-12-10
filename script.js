@@ -37,9 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
 function handleTagFound(id) {
     const box = document.getElementById(`box-${id}`);
     
-    // すでに画像がある場合は何もしない（あるいは解説へ飛ぶだけでもOK）
+    // もし既に持っているタグをスキャンしたら、すぐ解説へ
     if (box.classList.contains('filled')) {
-        // 演出なしですぐ解説へ
         window.location.href = `detail.html?id=${id}`;
         return;
     }
@@ -51,22 +50,18 @@ function handleTagFound(id) {
     // 2. 演出（アニメーション）クラスを追加
     box.classList.add('flash-effect');
 
-    // 3. 状態を保存する (LocalStorage)
+    // 3. 状態を保存する
     saveState(id);
 
-    // 4. 演出が終わった後（1.5秒後）に解説ページへ移動
+    // 【ポイント1】 クリックしても飛べるように設定しておく（後で戻ってきたとき用）
+    box.onclick = () => {
+        window.location.href = `detail.html?id=${id}`;
+    };
+
+    // 【ポイント2】 1.5秒後に自動で飛ぶ設定もする（スキャン時用）
     setTimeout(() => {
         window.location.href = `detail.html?id=${id}`;
     }, 1500);
-}
-
-// 状態を保存する関数
-function saveState(id) {
-    let collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
-    if (!collected.includes(id)) {
-        collected.push(id);
-        localStorage.setItem('nfc_collection', JSON.stringify(collected));
-    }
 }
 
 // ページ読み込み時に状態を復元する関数
@@ -78,6 +73,20 @@ function loadState() {
         if (box) {
             box.innerHTML = `<img src="images/img${id}.jpg" alt="Image ${id}">`;
             box.classList.add('filled');
+            
+            // 【ポイント3】 復元したマスもクリックしたら飛べるように設定
+            box.onclick = () => {
+                window.location.href = `detail.html?id=${id}`;
+            };
         }
     });
+}
+
+// 状態を保存する関数
+function saveState(id) {
+    let collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
+    if (!collected.includes(id)) {
+        collected.push(id);
+        localStorage.setItem('nfc_collection', JSON.stringify(collected));
+    }
 }

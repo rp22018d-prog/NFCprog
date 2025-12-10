@@ -37,28 +37,47 @@ document.addEventListener('DOMContentLoaded', () => {
 function handleTagFound(id) {
     const box = document.getElementById(`box-${id}`);
     
-    // もし既に持っているタグをスキャンしたら、すぐ解説へ
+    // 既に持っているタグなら解説へ
     if (box.classList.contains('filled')) {
         window.location.href = `detail.html?id=${id}`;
         return;
     }
 
-    // 1. 画像を表示して「埋まった」状態にする
+    // 1. 画像を表示
     box.innerHTML = `<img src="images/img${id}.jpg" alt="Image ${id}">`;
     box.classList.add('filled');
-    
-    // 2. 演出（アニメーション）クラスを追加
     box.classList.add('flash-effect');
 
-    // 3. 状態を保存する
+    // 2. 状態を保存
     saveState(id);
 
-    // 【ポイント1】 クリックしても飛べるように設定しておく（後で戻ってきたとき用）
+    // 3. クリックイベント設定
     box.onclick = () => {
         window.location.href = `detail.html?id=${id}`;
     };
 
-    // 【ポイント2】 1.5秒後に自動で飛ぶ設定もする（スキャン時用）
+    // ★ここを変更：コンプリート判定を行う
+    const collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
+    
+    if (collected.length === 9) {
+        // --- 9個そろった時の特別演出 ---
+        
+        // 1. お祝い画面を表示
+        const overlay = document.getElementById('complete-overlay');
+        overlay.classList.remove('hidden');
+
+        // 2. ボタンを押したら最後の解説へ飛ぶように設定
+        const nextBtn = document.getElementById('goto-detail-btn');
+        nextBtn.onclick = () => {
+            window.location.href = `detail.html?id=${id}`;
+        };
+
+        // ※ここで終了（return）することで、下のsetTimeout（自動移動）を実行させない！
+        return; 
+    }
+
+    // --- 通常時の処理 ---
+    // 1.5秒後に自動で飛ぶ
     setTimeout(() => {
         window.location.href = `detail.html?id=${id}`;
     }, 1500);

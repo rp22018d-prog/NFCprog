@@ -30,6 +30,18 @@
     <!-- デバッグ用：データをリセットするボタン -->
     <button onclick="localStorage.clear(); location.reload();" style="margin-top: 20px; font-size: 10px;">リセット</button>
 
+    <!-- コンプリート時のお祝い画面 -->
+    <div id="complete-overlay" class="overlay hidden">
+        <div class="overlay-content">
+            <h2>🎉 コンプリート！ 🎉</h2>
+            <p>全てのタグを集めました！</p>
+            <button id="goto-detail-btn">最後の解説を見る</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
     <script src="script.js"></script>
 </body>
 </html>

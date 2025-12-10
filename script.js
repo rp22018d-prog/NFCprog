@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         collected.forEach(id => {
             const box = document.getElementById(`box-${id}`);
             if (box) {
-                box.innerHTML = `<img src="images/img${id}.jpg" alt="Image ${id}">`;
+                box.innerHTML = `<img src="images/img${id}.png" alt="Image ${id}">`;
                 box.classList.add('filled');
                 
                 box.onclick = () => {

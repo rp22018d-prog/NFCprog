@@ -15,7 +15,13 @@ body {
 
 .box {
     aspect-ratio: 1 / 1; /* 正方形にする */
-    background-color: #ddd;
+    background-color: #f0f0f0;
+    /* 画像を指定 */
+    background-image: url(images/placeholder.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    
     border: 2px solid #bbb;
     border-radius: 8px;
     display: flex;

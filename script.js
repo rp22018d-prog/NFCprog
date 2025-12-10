@@ -85,9 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- 通常時の処理 ---
         // 1.5秒後に自動で飛ぶ
+        // テストのために秒数追加
         setTimeout(() => {
             window.location.href = `detail.html?id=${id}`;
-        }, 1500);
+        }, 5000);
     }
 
     // 状態を保存する関数

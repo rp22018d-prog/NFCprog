@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>解説ページ</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 20px; }
+        img { max-width: 100%; border-radius: 10px; margin-bottom: 20px; }
+        .back-btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 15px 30px;
+            background: #333;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="detail-title">解説</h1>
+    <img id="detail-img" src="" alt="">
+    <p id="detail-desc">ここに解説文が入ります。</p>
+
+    <!-- 戻るボタン -->
+    <a href="index.html" class="back-btn">一覧に戻る</a>
+
+    <script>
+        // URLの ?id=XX を取得する
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+
+        // IDごとのデータ（本来はもっと文章を長くできます）
+        const data = {
+            "1": { title: "キャラクターA", desc: "これは1番目のタグのキャラクターです。" },
+            "2": { title: "場所B", desc: "ここは2番目のスポットです。" },
+            "3": { title: "アイテムC", desc: "伝説のアイテムを手に入れました。" },
+            // ... 9まで追加してください
+        };
+
+        // 画面に表示
+        if(id && data[id]) {
+            document.getElementById('detail-title').innerText = data[id].title;
+            document.getElementById('detail-desc').innerText = data[id].desc;
+            document.getElementById('detail-img').src = `images/img${id}.jpg`;
+        } else {
+            document.getElementById('detail-desc').innerText = "データが見つかりません。";
+        }
+    </script>
+</body>
+</html>

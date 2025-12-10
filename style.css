@@ -1,0 +1,59 @@
+body {
+    font-family: sans-serif;
+    text-align: center;
+    background-color: #f0f0f0;
+    padding: 20px;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3列 */
+    gap: 10px;
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+.box {
+    aspect-ratio: 1 / 1; /* 正方形にする */
+    background-color: #ddd;
+    border: 2px solid #bbb;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.3s;
+}
+
+/* 画像が入ったときのスタイル */
+.box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* 演出用のアニメーションクラス */
+.flash-effect {
+    animation: flash 1s ease-out;
+    border-color: gold;
+    transform: scale(1.1);
+    z-index: 10;
+}
+
+@keyframes flash {
+    0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); background-color: #fff; }
+    70% { box-shadow: 0 0 0 20px rgba(255, 215, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+}

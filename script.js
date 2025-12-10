@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         isProcessing = true;
 
         // 1. 画像を表示
-        box.innerHTML = `<img src="images/img${id}.jpg" alt="Image ${id}">`;
+        box.innerHTML = `<img src="images/img${id}.png" alt="Image ${id}">`;
         box.classList.add('filled');
         box.classList.add('flash-effect');
 

@@ -37,7 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
 function handleTagFound(id) {
     const box = document.getElementById(`box-${id}`);
     
-    // 既に持っているタグなら解説へ
+    // 【注意】すでに埋まっているタグをタッチした場合は、すぐ解説へ飛びます
+    // （コンプリート演出を見たい場合は、リセットして「まだ埋まっていないタグ」としてスキャンする必要があります）
     if (box.classList.contains('filled')) {
         window.location.href = `detail.html?id=${id}`;
         return;
@@ -56,28 +57,26 @@ function handleTagFound(id) {
         window.location.href = `detail.html?id=${id}`;
     };
 
-    // ★ここを変更：コンプリート判定を行う
+    // ★デバッグ：現在の個数を取得
     const collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
-    
-    if (collected.length === 9) {
-        // --- 9個そろった時の特別演出 ---
-        
-        // 1. お祝い画面を表示
+    console.log("現在の個数:", collected.length); 
+
+    // ★修正：「=== 9」ではなく「>= 9」にする（万が一重複などで10個になっても動くように）
+    if (collected.length >= 9) {
+        // --- コンプリート演出 ---
         const overlay = document.getElementById('complete-overlay');
         overlay.classList.remove('hidden');
 
-        // 2. ボタンを押したら最後の解説へ飛ぶように設定
         const nextBtn = document.getElementById('goto-detail-btn');
         nextBtn.onclick = () => {
             window.location.href = `detail.html?id=${id}`;
         };
 
-        // ※ここで終了（return）することで、下のsetTimeout（自動移動）を実行させない！
+        // ここで処理を終了（下のsetTimeoutに行かせない！）
         return; 
     }
 
     // --- 通常時の処理 ---
-    // 1.5秒後に自動で飛ぶ
     setTimeout(() => {
         window.location.href = `detail.html?id=${id}`;
     }, 1500);

@@ -1,91 +1,97 @@
+// ★ログを表示する機能（犯人特定用）
+function log(msg) {
+    const logDiv = document.getElementById('debug-log');
+    // デバッグ用エリアを表示する
+    logDiv.style.display = 'block';
+    
+    const p = document.createElement('div');
+    p.textContent = new Date().toLocaleTimeString() + ': ' + msg;
+    logDiv.prepend(p); // 新しいものを上に追加
+    console.log(msg);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    loadState(); // 保存された状態を復元
+    log("プログラム開始 v2"); // 画面に出れば新しいコードが動いている証拠
+    loadState(); 
 
     const scanBtn = document.getElementById('scanBtn');
     const statusMsg = document.getElementById('status');
-
-    // ★最強の連打防止：最後にスキャンした時間を記録する変数
     let lastScanTime = 0;
 
     scanBtn.addEventListener('click', async () => {
+        log("スキャンボタン押下");
         try {
             const ndef = new NDEFReader();
             await ndef.scan();
             statusMsg.textContent = "タグをタッチしてください...";
+            log("スキャン待機中...");
 
             ndef.onreading = event => {
-                // ★ここが修正ポイント
-                // 「現在時刻」と「最後にスキャンした時刻」の差が2000ミリ秒（2秒）未満なら
-                // 無条件で無視して終了する（門前払い）
                 const now = Date.now();
-                if (now - lastScanTime < 5000) {
+                // 時間差チェック
+                if (now - lastScanTime < 2000) {
+                    log("【ブロック】短時間の連打を無視しました");
                     return; 
                 }
-
-                // 2秒以上経っていれば、時刻を更新して処理を進める
                 lastScanTime = now;
 
                 const decoder = new TextDecoder();
                 for (const record of event.message.records) {
                     const text = decoder.decode(record.data);
-                    console.log("Read: " + text);
+                    log("読み取りデータ: " + text); // ★ここでタグの中身が見えます
 
                     if (text >= 1 && text <= 9) {
                         handleTagFound(text);
                     } else {
-                        statusMsg.textContent = "未対応のタグです: " + text;
+                        statusMsg.textContent = "未対応: " + text;
                     }
                 }
             };
         } catch (error) {
             statusMsg.textContent = "エラー: " + error;
-            console.log(error);
+            log("エラー発生: " + error);
         }
     });
 
-    // タグが見つかったときの処理
     function handleTagFound(id) {
         const box = document.getElementById(`box-${id}`);
         
-        // すでに埋まっている場合（過去に登録済み）
+        // すでに埋まっている場合
         if (box.classList.contains('filled')) {
-            // すでに持っているなら即移動でOK
+            log(`ID:${id} は既に登録済み。移動します。`);
             window.location.href = `detail.html?id=${id}`;
             return;
         }
 
-        // --- ここから新しいタグの登録処理 ---
-        
-        // 1. 画像を表示
-        // （ここの画像パスはご自身の画像に合わせてください）
+        log(`ID:${id} の新規登録処理を開始`);
+
+        // 画像表示
         box.innerHTML = `<img src="images/img${id}.png" alt="Image ${id}">`;
-        
         box.classList.add('filled');
         box.classList.add('flash-effect');
 
-        // 2. 状態を保存
         saveState(id);
 
-        // 3. コンプリート判定
+        // コンプリート判定
         const collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
         if (collected.length >= 9) {
+            log("コンプリート！演出を表示");
             const overlay = document.getElementById('complete-overlay');
             overlay.classList.remove('hidden');
-
-            const nextBtn = document.getElementById('goto-detail-btn');
-            nextBtn.onclick = () => {
+            document.getElementById('goto-detail-btn').onclick = () => {
                 window.location.href = `detail.html?id=${id}`;
             };
             return; 
         }
 
-        // 4. 通常時の処理（1.5秒後に自動で飛ぶ）
+        log("1.5秒後に移動予約しました...");
+        // 1.5秒後に移動
         setTimeout(() => {
+            log("時間経過。移動します！");
             window.location.href = `detail.html?id=${id}`;
-        }, 3000);
+        }, 1500);
     }
 
-    // 状態を保存する関数
     function saveState(id) {
         let collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
         if (!collected.includes(id)) {
@@ -94,17 +100,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ページ読み込み時に状態を復元する関数
     function loadState() {
         let collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
-        
         collected.forEach(id => {
             const box = document.getElementById(`box-${id}`);
             if (box) {
-                // 復元時はクリックイベントをつける（後で見返すとき用）
                 box.innerHTML = `<img src="images/img${id}.png" alt="Image ${id}">`;
                 box.classList.add('filled');
-                
                 box.onclick = () => {
                     window.location.href = `detail.html?id=${id}`;
                 };

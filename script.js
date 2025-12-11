@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 「現在時刻」と「最後にスキャンした時刻」の差が2000ミリ秒（2秒）未満なら
                 // 無条件で無視して終了する（門前払い）
                 const now = Date.now();
-                if (now - lastScanTime < 2000) {
+                if (now - lastScanTime < 5000) {
                     return; 
                 }
 
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 4. 通常時の処理（1.5秒後に自動で飛ぶ）
         setTimeout(() => {
             window.location.href = `detail.html?id=${id}`;
-        }, 1500);
+        }, 3000);
     }
 
     // 状態を保存する関数

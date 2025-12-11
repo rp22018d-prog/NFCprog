@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 1. 画像を表示
         // （ここの画像パスはご自身の画像に合わせてください）
-        box.innerHTML = `<img src="images/img${id}.jpg" alt="Image ${id}">`;
+        box.innerHTML = `<img src="images/img${id}.png" alt="Image ${id}">`;
         
         box.classList.add('filled');
         box.classList.add('flash-effect');
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const box = document.getElementById(`box-${id}`);
             if (box) {
                 // 復元時はクリックイベントをつける（後で見返すとき用）
-                box.innerHTML = `<img src="images/img${id}.jpg" alt="Image ${id}">`;
+                box.innerHTML = `<img src="images/img${id}.png" alt="Image ${id}">`;
                 box.classList.add('filled');
                 
                 box.onclick = () => {

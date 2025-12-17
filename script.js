@@ -124,35 +124,31 @@ function checkGameStatus() {
     }
 }
 
-// ★リザルト画面の生成と表示
+// ★リザルト画面の生成と表示（デザイン強化版）
 function showResult() {
     // データの取得
     const collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
     const startTime = parseInt(localStorage.getItem('nfc_start_time') || Date.now());
     const endTime = parseInt(localStorage.getItem('nfc_end_time') || Date.now());
 
-    // タイム計算（秒）
+    // タイム計算
     let diffSeconds = Math.floor((endTime - startTime) / 1000);
     if (diffSeconds < 0) diffSeconds = 0;
-
     const minutes = Math.floor(diffSeconds / 60);
     const seconds = diffSeconds % 60;
-    const timeStr = `${minutes}分 ${seconds}秒`;
+    // 0埋め（例: 5秒 → 05秒）して見栄えを良くする
+    const timeStr = `${minutes}分${seconds.toString().padStart(2, '0')}秒`;
 
-    // 画面にセット
-    document.getElementById('res-count').innerText = collected.length;
-    document.getElementById('res-time').innerText = timeStr;
-
-    // 採点ロジック（自由に変えてください）
+    // 採点ロジック
     let rank = "C";
     let comment = "次はもっと集めよう！";
     const count = collected.length;
 
     if (count === 9) {
-        rank = "S"; // パーフェクト
+        rank = "S";
         comment = "完璧です！伝説の探検家！";
-        if (minutes < 10) {
-            rank = "SS"; // 早解きボーナス
+        if (minutes < 10) { // 10分以内ならSS
+            rank = "SS";
             comment = "神速の探検家！！凄すぎる！";
         }
     } else if (count >= 7) {
@@ -163,13 +159,34 @@ function showResult() {
         comment = "なかなかやりますね！";
     }
 
-    document.getElementById('res-rank').innerText = `ランク：${rank}`;
-    document.getElementById('res-comment').innerText = comment;
+    // ★HTMLへの反映（デザイン用の構造に変更）
+    // 1. スコアとタイムを入れる箱
+    const statsHtml = `
+        <div class="result-stats">
+            <p>獲得数 <span>${count} / 9</span></p>
+            <p>タイム <span>${timeStr}</span></p>
+        </div>
+    `;
+    
+    // 以前のHTML構造を一度クリアしてから新しいデザインを入れる方法もありますが、
+    // ここでは要素の中身だけうまく書き換えます。
+    
+    // result-overlayの中身を取得
+    const contentBox = document.querySelector('#result-overlay .overlay-content');
+    
+    // 中身をデザインに合わせて書き換え（innerHTMLで丸ごと更新）
+    contentBox.innerHTML = `
+        <h2>🏆 結果発表 🏆</h2>
+        ${statsHtml}
+        <div id="res-rank" class="rank-${rank.toLowerCase()}">${rank}</div>
+        <p id="res-comment">${comment}</p>
+        <button onclick="closeResult()">閉じる</button>
+    `;
 
     // 表示
     document.getElementById('result-overlay').classList.remove('hidden');
     
-    // クイズ画面が出てたら消しておく
+    // 他の画面を消す
     document.getElementById('quiz-overlay').classList.add('hidden');
     document.getElementById('complete-overlay').classList.add('hidden');
 }

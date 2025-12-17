@@ -7,9 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>NFC システム</h1>
-    <!-- ログ表示 -->
-    <div id="debug-log" style="border:1px solid red; padding:5px; font-size:12px; height:100px; overflow:scroll; display:none;"></div>
+    <h1>NFC コレクション</h1>
     
     <!-- NFC読み取り開始ボタン -->
     <button id="scanBtn">スキャン開始</button>
@@ -17,7 +15,6 @@
 
     <!-- 3x3のグリッド -->
     <div class="grid-container">
-        <!-- 1〜9番のマス -->
         <div class="box" id="box-1" data-id="1"></div>
         <div class="box" id="box-2" data-id="2"></div>
         <div class="box" id="box-3" data-id="3"></div>
@@ -29,7 +26,7 @@
         <div class="box" id="box-9" data-id="9"></div>
     </div>
 
-    <!-- デバッグ用：リセットボタン -->
+    <!-- デバッグ用：リセットボタン（本番で不要なら消してもOKです） -->
     <button onclick="localStorage.clear(); location.reload();" style="margin-top: 20px; font-size: 10px;">リセット</button>
 
     <!-- コンプリート時のお祝い画面 -->
@@ -41,7 +38,16 @@
         </div>
     </div>
 
-    <!-- ★修正箇所：スクリプトはここで1回だけ読み込む（v=3に変更） -->
-    <script src="script.js?v=3"></script>
+    <!-- ★追加：ヒント表示用の画面 -->
+    <div id="hint-overlay" class="overlay hidden" onclick="closeHint()">
+        <div class="overlay-content" onclick="event.stopPropagation()">
+            <h2>💡 ヒント</h2>
+            <p id="hint-text">ここにヒントが表示されます</p>
+            <button onclick="closeHint()">閉じる</button>
+        </div>
+    </div>
+
+    <!-- キャッシュ対策（数字を増やします） -->
+    <script src="script.js?v=5"></script>
 </body>
 </html>

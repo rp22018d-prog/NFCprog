@@ -11,6 +11,16 @@ const hints = {
     9: "9番のヒント：一番奥の部屋。",
 };
 
+// 効果音の準備
+const audioScan = new Audio('sounds/scan.mp3');
+const audioComplete = new Audio('sounds/complete.mp3'); // コンプリート音がない場合は scan.mp3 にしてもOK
+
+// スマホで音を鳴らすための「おまじない」（音量設定など）
+audioScan.volume = 1.0;
+audioComplete.volume = 1.0;
+
+
+
 let processingId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -25,6 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
     checkCompleteInitial();
 
     scanBtn.addEventListener('click', async () => {
+        // 無音で一瞬再生して、ブラウザに「音出していいよ」と認識させる
+        audioScan.play().then(() => audioScan.pause()).catch(e => console.log(e));
+        audioScan.currentTime = 0;
+
         scanBtn.disabled = true;
         scanBtn.textContent = "スキャン待機中...";
         
@@ -98,23 +112,34 @@ function handleTagFound(id) {
         
         // ★コンプリート時の処理
         if (collected.length >= 9) {
+            // ★コンプリート音を再生！
+            audioComplete.currentTime = 0; // 最初から
+            audioComplete.play().catch(e => console.log("再生エラー", e));
+
             // お祝い画面を表示
             const overlay = document.getElementById('complete-overlay');
             overlay.classList.remove('hidden');
-            
-            // 下の「最後の試練」ボタンも表示しておく（戻ってきたとき用）
             document.getElementById('final-challenge-area').classList.remove('hidden');
             
-            // お祝い画面のボタンを押したら、そのタグの解説へ飛ぶ設定
+            // ボタン設定
             document.getElementById('complete-detail-btn').onclick = () => {
                 window.location.href = `detail.html?id=${id}`;
             };
             
-            return; // ここで止めて、ユーザーがボタンを押すのを待つ
+            return; 
         }
+
+        // ★通常スキャン時の処理
+        // ここで「ピコン！」と鳴らす
+        audioScan.currentTime = 0; // 最初から再生
+        audioScan.play().catch(e => console.log("再生エラー", e));
+    } else {
+        // (既に持っている場合も音を鳴らしたいなら、ここに audioScan.play() を追加)
+        audioScan.currentTime = 0; 
+        audioScan.play().catch(e => {});
     }
 
-    // 通常移動（コンプリート以外）
+    // 通常移動
     setTimeout(() => {
         window.location.href = `detail.html?id=${id}`;
     }, 1000);

@@ -88,24 +88,33 @@ function handleTagFound(id) {
     void box.offsetWidth; 
     box.classList.add('flash-effect');
 
+    // まだ持っていない場合
     if (!box.classList.contains('filled')) {
         box.innerHTML = `<img src="images/img${id}.jpg" alt="Image ${id}">`;
         box.classList.add('filled');
         saveState(id);
 
         const collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
+        
+        // ★コンプリート時の処理
         if (collected.length >= 9) {
-            // コンプリートお祝い表示
+            // お祝い画面を表示
             const overlay = document.getElementById('complete-overlay');
             overlay.classList.remove('hidden');
             
-            // ★「最後の試練」ボタンも表示する
+            // 下の「最後の試練」ボタンも表示しておく（戻ってきたとき用）
             document.getElementById('final-challenge-area').classList.remove('hidden');
             
-            return; 
+            // ★追加：お祝い画面のボタンを押したら、そのタグの解説へ飛ぶ設定！
+            document.getElementById('complete-detail-btn').onclick = () => {
+                window.location.href = `detail.html?id=${id}`;
+            };
+            
+            return; // ここで止めて、ユーザーがボタンを押すのを待つ
         }
     }
 
+    // 通常移動（コンプリート以外）
     setTimeout(() => {
         window.location.href = `detail.html?id=${id}`;
     }, 1500);

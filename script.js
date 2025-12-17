@@ -168,9 +168,6 @@ function showResult() {
         </div>
     `;
     
-    // 以前のHTML構造を一度クリアしてから新しいデザインを入れる方法もありますが、
-    // ここでは要素の中身だけうまく書き換えます。
-    
     // result-overlayの中身を取得
     const contentBox = document.querySelector('#result-overlay .overlay-content');
     
@@ -194,8 +191,6 @@ function showResult() {
 window.closeResult = function() {
     document.getElementById('result-overlay').classList.add('hidden');
 }
-
-// --- 以下、既存の関数（修正あり） ---
 
 function handleTagFound(id) {
     const box = document.getElementById(`box-${id}`);
@@ -241,7 +236,7 @@ function handleTagFound(id) {
 
     setTimeout(() => {
         window.location.href = `detail.html?id=${id}`;
-    }, 1500);
+    }, 1000);
 }
 
 // クイズ判定処理

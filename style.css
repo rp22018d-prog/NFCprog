@@ -146,7 +146,7 @@ button {
     background: #fff;
     max-width: 90%;
     width: 400px;
-    text-align: left; /* 文章なので左揃え */
+    text-align: center;
     line-height: 1.8;
 }
 
@@ -157,6 +157,12 @@ button {
     margin-bottom: 15px;
     border-bottom: 1px solid #ddd;
     padding-bottom: 10px;
+}
+
+/* 文章だけ左寄せ */
+#quiz-text-area{
+    text-align: left;
+    margin-bottom: 20px;
 }
 
 /* 虫食いのプルダウン */

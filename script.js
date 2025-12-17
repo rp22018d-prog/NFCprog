@@ -141,22 +141,22 @@ function showResult() {
 
     // 採点ロジック
     let rank = "C";
-    let comment = "次はもっと集めよう！";
+    let comment = "次頑張ればええで！";
     const count = collected.length;
 
     if (count === 9) {
         rank = "S";
-        comment = "完璧です！伝説の探検家！";
-        if (minutes < 10) { // 10分以内ならSS
+        comment = "完璧や！めっちゃすごいやん！！";
+        if (minutes < 10) { // 5分以内ならSS
             rank = "SS";
-            comment = "神速の探検家！！凄すぎる！";
+            comment = "速いし完璧やん！！めちゃくちゃすごいやん！！";
         }
     } else if (count >= 7) {
         rank = "A";
-        comment = "素晴らしい成果です！";
+        comment = "すごいやん！その調子や！";
     } else if (count >= 4) {
         rank = "B";
-        comment = "なかなかやりますね！";
+        comment = "よー頑張ったやん！";
     }
 
     // ★HTMLへの反映（デザイン用の構造に変更）
@@ -257,7 +257,7 @@ window.checkQuiz = function() {
     }
 
     if (isAllCorrect) {
-        alert("🎉 大正解！\nすべての謎が解けました！");
+        alert("🎉 大正解！\nすべて理解できました！");
         // ★ここでゲームクリア処理（リザルトへ）
         finishGame();
     } else {

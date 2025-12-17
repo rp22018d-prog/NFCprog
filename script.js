@@ -111,7 +111,17 @@ function checkGameStatus() {
         scanBtn.textContent = "受付終了";
         scanBtn.style.backgroundColor = "#aaa"; // グレーアウト
         statusMsg.textContent = "お疲れ様でした！解説ページは引き続き閲覧可能です。";
-        retireArea.style.display = 'none'; // リタイアボタン消す
+
+        // リタイアボタンを「結果を見る」に変える
+        if (retireArea) {
+            retireArea.style.display = 'block'; // 表示する
+            const retireBtn = retireArea.querySelector('button');
+            if (retireBtn) {
+                retireBtn.textContent = "結果を見る"; // 文言変更
+                retireBtn.onclick = showResult;       // 動きを「リザルト表示」に変更
+                retireBtn.style.background = "#2196f3"; // 色を青などに変えると分かりやすい
+            }
+        }
         
         // クイズの「回答する」ボタンを「結果を見る」に変える
         const quizBtn = document.getElementById('quiz-answer-btn');

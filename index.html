@@ -13,7 +13,7 @@
     <button id="scanBtn">スキャン開始</button>
     <p id="status">ボタンを押してスキャンを開始してください</p>
 
-    <!-- 3x3のグリッド -->
+    <!-- 3x3のグリッド（そのまま） -->
     <div class="grid-container">
         <div class="box" id="box-1" data-id="1"></div>
         <div class="box" id="box-2" data-id="2"></div>
@@ -26,28 +26,55 @@
         <div class="box" id="box-9" data-id="9"></div>
     </div>
 
-    <!-- デバッグ用：リセットボタン（本番で不要なら消してもOKです） -->
-    <button onclick="localStorage.clear(); location.reload();" style="margin-top: 20px; font-size: 10px;">リセット</button>
+    <!-- ★変更：リセットボタンを削除しました（裏コマンド化） -->
 
-    <!-- コンプリート時のお祝い画面 -->
+    <!-- ★追加：コンプリート後に表示される「最後の試練へ」ボタン -->
+    <div id="final-challenge-area" class="hidden" style="margin-top: 30px;">
+        <p>全ての記憶が集まった...</p>
+        <button id="open-quiz-btn" class="challenge-btn">最後の試練に挑む</button>
+    </div>
+
+    <!-- コンプリート時のお祝い画面（既存・少し修正） -->
     <div id="complete-overlay" class="overlay hidden">
         <div class="overlay-content">
             <h2>🎉 コンプリート！ 🎉</h2>
             <p>全てのタグを集めました！</p>
-            <button id="goto-detail-btn">最後の解説を見る</button>
+            <!-- ここにあった「最後の解説」ボタンは消して、下のクイズに誘導してもOK -->
+            <button onclick="document.getElementById('complete-overlay').classList.add('hidden')">閉じる</button>
         </div>
     </div>
 
-    <!-- ★追加：ヒント表示用の画面 -->
+    <!-- ヒント表示用の画面（既存） -->
     <div id="hint-overlay" class="overlay hidden" onclick="closeHint()">
         <div class="overlay-content" onclick="event.stopPropagation()">
             <h2>💡 ヒント</h2>
-            <p id="hint-text">ここにヒントが表示されます</p>
+            <p id="hint-text">ヒント</p>
             <button onclick="closeHint()">閉じる</button>
         </div>
     </div>
 
-    <!-- キャッシュ対策（数字を増やします） -->
-    <script src="script.js?v=5"></script>
+    <!-- ★追加：クイズ画面 -->
+    <div id="quiz-overlay" class="overlay hidden">
+        <div class="overlay-content quiz-content">
+            <h2>📜 最後の試練</h2>
+            <p class="quiz-instruction">空白を埋めて文章を完成させよ</p>
+            
+            <!-- クイズの文章（虫食い） -->
+            <div id="quiz-text-area">
+                <p>
+                    我々は <select id="q1"><option value="">???</option><option value="wrong">未来</option><option value="correct">過去</option><option value="wrong">宇宙</option></select> から来た探検隊である。
+                    この遺跡に眠る <select id="q2"><option value="">???</option><option value="correct">秘宝</option><option value="wrong">爆弾</option><option value="wrong">スマホ</option></select> を見つけるために、
+                    9つの <select id="q3"><option value="">???</option><option value="wrong">石板</option><option value="wrong">鍵</option><option value="correct">カケラ</option></select> を集めた。
+                    今ここに、封印は <select id="q4"><option value="">???</option><option value="correct">解かれた</option><option value="wrong">砕かれた</option><option value="wrong">忘れられた</option></select>。
+                </p>
+            </div>
+
+            <button onclick="checkQuiz()" class="challenge-btn" style="margin-top:20px;">回答する</button>
+            <button onclick="closeQuiz()" style="margin-top:10px; background:#666;">閉じる</button>
+        </div>
+    </div>
+
+    <!-- キャッシュ対策 -->
+    <script src="script.js?v=6"></script>
 </body>
 </html>

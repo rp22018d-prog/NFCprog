@@ -122,3 +122,61 @@ button {
     background: linear-gradient(135deg, #fff 0%, #87CEFA 100%); /*水色グラデ*/
     box-shadow: 0 0 20px rgba(135, 206, 250, 0.8);
 }
+
+/* 最後の試練ボタン */
+.challenge-btn {
+    background-color: #d32f2f; /* 赤色 */
+    color: white;
+    font-weight: bold;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 30px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* クイズ画面の調整 */
+.quiz-content {
+    background: #fff;
+    max-width: 90%;
+    width: 400px;
+    text-align: left; /* 文章なので左揃え */
+    line-height: 1.8;
+}
+
+.quiz-instruction {
+    text-align: center;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+/* 虫食いのプルダウン */
+select {
+    font-size: 16px;
+    padding: 5px;
+    border: 2px solid #333;
+    border-radius: 5px;
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    cursor: pointer;
+}
+
+/* 正解・不正解の演出用 */
+select.correct-answer {
+    background-color: #c8e6c9;
+    border-color: #2e7d32;
+    color: #2e7d32;
+}
+select.wrong-answer {
+    background-color: #ffcdd2;
+    border-color: #c62828;
+}

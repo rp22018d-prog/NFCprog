@@ -11,32 +11,32 @@ const hints = {
     9: "9番のヒント：一番奥の部屋。",
 };
 
-// 効果音の準備
+// 効果音
 const audioScan = new Audio('sounds/scan.mp3');
-const audioComplete = new Audio('sounds/complete.mp3'); // コンプリート音がない場合は scan.mp3 にしてもOK
-
-// スマホで音を鳴らすための「おまじない」（音量設定など）
+const audioComplete = new Audio('sounds/complete.mp3'); 
 audioScan.volume = 1.0;
 audioComplete.volume = 1.0;
-
-
 
 let processingId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     loadState(); 
     setupBoxes();
-    setupHiddenReset(); // ★裏コマンドの設定
+    setupHiddenReset();
+    checkGameStatus(); // ★ゲームが終了しているかチェック
 
     const scanBtn = document.getElementById('scanBtn');
     const statusMsg = document.getElementById('status');
     
-    // コンプリート済みなら「最後の試練」ボタンを表示
-    checkCompleteInitial();
+    // コンプリート確認
+    const collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
+    if (collected.length >= 9) {
+        document.getElementById('final-challenge-area').classList.remove('hidden');
+    }
 
     scanBtn.addEventListener('click', async () => {
-        // 無音で一瞬再生して、ブラウザに「音出していいよ」と認識させる
-        audioScan.play().then(() => audioScan.pause()).catch(e => console.log(e));
+        // 音出し準備
+        audioScan.play().then(() => audioScan.pause()).catch(e => {});
         audioScan.currentTime = 0;
 
         scanBtn.disabled = true;
@@ -61,111 +61,177 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         } catch (error) {
             statusMsg.textContent = "エラー: " + error;
-            scanBtn.disabled = false;
+            // ゲーム終了してない場合のみボタン復活
+            if (!localStorage.getItem('nfc_game_finished')) {
+                scanBtn.disabled = false;
+            }
         }
     });
 
-    // クイズボタンのイベント
     document.getElementById('open-quiz-btn').onclick = () => {
         document.getElementById('quiz-overlay').classList.remove('hidden');
     };
 });
 
-// ★裏コマンド：タイトルを5回連打でリセット
-function setupHiddenReset() {
-    let clickCount = 0;
-    const title = document.querySelector('h1'); // タイトル要素を取得
+// ★リタイア機能
+window.retireGame = function() {
+    if(!confirm("本当にリタイアして結果を見ますか？\n（これ以上タグを集められなくなります）")) return;
     
-    title.onclick = () => {
-        clickCount++;
-        // 5回クリックされたら
-        if (clickCount >= 5) {
-            if(confirm("データをリセットしますか？")) {
-                localStorage.clear();
-                location.reload();
-            }
-            clickCount = 0;
-        }
-        // 1秒間操作がなかったらカウントを0に戻す
-        setTimeout(() => {
-            clickCount = 0;
-        }, 1000);
-    };
+    // 終了処理へ
+    finishGame();
 }
+
+// ★ゲーム終了処理（リタイア・クイズ正解共通）
+function finishGame() {
+    // 1. 終了フラグを保存
+    localStorage.setItem('nfc_game_finished', 'true');
+    
+    // 2. 終了時間を記録（まだ記録してなければ）
+    if (!localStorage.getItem('nfc_end_time')) {
+        localStorage.setItem('nfc_end_time', Date.now());
+    }
+
+    // 3. 画面の状態更新（ボタン無効化など）
+    checkGameStatus();
+
+    // 4. リザルト画面を表示
+    showResult();
+}
+
+// ★画面の表示切り替え（ロード時・終了時）
+function checkGameStatus() {
+    const isFinished = localStorage.getItem('nfc_game_finished');
+    const scanBtn = document.getElementById('scanBtn');
+    const retireArea = document.getElementById('retire-area');
+    const statusMsg = document.getElementById('status');
+
+    if (isFinished) {
+        // 終了後の状態
+        scanBtn.disabled = true;
+        scanBtn.textContent = "受付終了";
+        scanBtn.style.backgroundColor = "#aaa"; // グレーアウト
+        statusMsg.textContent = "お疲れ様でした！解説ページは引き続き閲覧可能です。";
+        retireArea.style.display = 'none'; // リタイアボタン消す
+        
+        // クイズの「回答する」ボタンを「結果を見る」に変える
+        const quizBtn = document.getElementById('quiz-answer-btn');
+        if(quizBtn) {
+            quizBtn.textContent = "結果を見る";
+            quizBtn.onclick = showResult;
+            quizBtn.classList.remove('challenge-btn'); // アニメーション消す
+            quizBtn.style.background = "#2196f3"; // 青色にする
+        }
+    }
+}
+
+// ★リザルト画面の生成と表示
+function showResult() {
+    // データの取得
+    const collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
+    const startTime = parseInt(localStorage.getItem('nfc_start_time') || Date.now());
+    const endTime = parseInt(localStorage.getItem('nfc_end_time') || Date.now());
+
+    // タイム計算（秒）
+    let diffSeconds = Math.floor((endTime - startTime) / 1000);
+    if (diffSeconds < 0) diffSeconds = 0;
+
+    const minutes = Math.floor(diffSeconds / 60);
+    const seconds = diffSeconds % 60;
+    const timeStr = `${minutes}分 ${seconds}秒`;
+
+    // 画面にセット
+    document.getElementById('res-count').innerText = collected.length;
+    document.getElementById('res-time').innerText = timeStr;
+
+    // 採点ロジック（自由に変えてください）
+    let rank = "C";
+    let comment = "次はもっと集めよう！";
+    const count = collected.length;
+
+    if (count === 9) {
+        rank = "S"; // パーフェクト
+        comment = "完璧です！伝説の探検家！";
+        if (minutes < 10) {
+            rank = "SS"; // 早解きボーナス
+            comment = "神速の探検家！！凄すぎる！";
+        }
+    } else if (count >= 7) {
+        rank = "A";
+        comment = "素晴らしい成果です！";
+    } else if (count >= 4) {
+        rank = "B";
+        comment = "なかなかやりますね！";
+    }
+
+    document.getElementById('res-rank').innerText = `ランク：${rank}`;
+    document.getElementById('res-comment').innerText = comment;
+
+    // 表示
+    document.getElementById('result-overlay').classList.remove('hidden');
+    
+    // クイズ画面が出てたら消しておく
+    document.getElementById('quiz-overlay').classList.add('hidden');
+    document.getElementById('complete-overlay').classList.add('hidden');
+}
+
+window.closeResult = function() {
+    document.getElementById('result-overlay').classList.add('hidden');
+}
+
+// --- 以下、既存の関数（修正あり） ---
 
 function handleTagFound(id) {
     const box = document.getElementById(`box-${id}`);
     processingId = id;
 
-    // 演出リセット
     box.classList.remove('flash-effect');
     void box.offsetWidth; 
     box.classList.add('flash-effect');
 
-    // まだ持っていない場合
     if (!box.classList.contains('filled')) {
+        // ★ここ重要：1つ目を初めて見つけた時にスタート時刻を記録
+        const collectedBefore = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
+        if (collectedBefore.length === 0) {
+            localStorage.setItem('nfc_start_time', Date.now());
+        }
+
         box.innerHTML = `<img src="images/img${id}.jpg" alt="Image ${id}">`;
         box.classList.add('filled');
         saveState(id);
 
         const collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
         
-        // ★コンプリート時の処理
         if (collected.length >= 9) {
-            // ★コンプリート音を再生！
-            audioComplete.currentTime = 0; // 最初から
-            audioComplete.play().catch(e => console.log("再生エラー", e));
+            audioComplete.currentTime = 0; 
+            audioComplete.play().catch(e => {});
 
-            // お祝い画面を表示
             const overlay = document.getElementById('complete-overlay');
             overlay.classList.remove('hidden');
             document.getElementById('final-challenge-area').classList.remove('hidden');
             
-            // ボタン設定
             document.getElementById('complete-detail-btn').onclick = () => {
                 window.location.href = `detail.html?id=${id}`;
             };
-            
             return; 
         }
-
-        // ★通常スキャン時の処理
-        // ここで「ピコン！」と鳴らす
-        audioScan.currentTime = 0; // 最初から再生
-        audioScan.play().catch(e => console.log("再生エラー", e));
+        
+        audioScan.currentTime = 0; 
+        audioScan.play().catch(e => {});
     } else {
-        // (既に持っている場合も音を鳴らしたいなら、ここに audioScan.play() を追加)
         audioScan.currentTime = 0; 
         audioScan.play().catch(e => {});
     }
 
-    // 通常移動
     setTimeout(() => {
         window.location.href = `detail.html?id=${id}`;
-    }, 1000);
+    }, 1500);
 }
 
-// 初期読み込み時にコンプリートしているか確認
-function checkCompleteInitial() {
-    const collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
-    if (collected.length >= 9) {
-        document.getElementById('final-challenge-area').classList.remove('hidden');
-    }
-}
-
-// ★クイズの判定処理
+// クイズ判定処理
 window.checkQuiz = function() {
-    // 正解のvalueを設定（HTMLのoption valueと合わせる）
-    const answers = {
-        q1: "correct",
-        q2: "correct",
-        q3: "correct",
-        q4: "correct"
-    };
-
+    const answers = { q1: "correct", q2: "correct", q3: "correct", q4: "correct" };
     let isAllCorrect = true;
 
-    // 各問題をチェック
     for (let key in answers) {
         const select = document.getElementById(key);
         if (select.value === answers[key]) {
@@ -179,16 +245,16 @@ window.checkQuiz = function() {
     }
 
     if (isAllCorrect) {
-        alert("🎉 大正解！\n真のエンディングへ到達しました！");
-        document.getElementById('quiz-overlay').classList.add('hidden');
+        alert("🎉 大正解！\nすべての謎が解けました！");
+        // ★ここでゲームクリア処理（リザルトへ）
+        finishGame();
     } else {
         alert("不正解があります。もう一度考えてみよう！");
     }
 }
 
-window.closeQuiz = function() {
-    document.getElementById('quiz-overlay').classList.add('hidden');
-}
+// ... setupBoxes, showHint, closeHint, closeQuiz, saveState, loadState, setupHiddenReset ...
+// （これらの関数は変更なしでそのまま下に置いてください）
 
 function setupBoxes() {
     for (let i = 1; i <= 9; i++) {
@@ -213,6 +279,10 @@ window.closeHint = function() {
     document.getElementById('hint-overlay').classList.add('hidden');
 }
 
+window.closeQuiz = function() {
+    document.getElementById('quiz-overlay').classList.add('hidden');
+}
+
 function saveState(id) {
     let collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
     if (!collected.includes(id)) {
@@ -230,4 +300,20 @@ function loadState() {
             box.classList.add('filled');
         }
     });
+}
+
+function setupHiddenReset() {
+    let clickCount = 0;
+    const title = document.querySelector('h1');
+    title.onclick = () => {
+        clickCount++;
+        if (clickCount >= 5) {
+            if(confirm("データをリセットしますか？")) {
+                localStorage.clear();
+                location.reload();
+            }
+            clickCount = 0;
+        }
+        setTimeout(() => clickCount = 0, 1000);
+    };
 }

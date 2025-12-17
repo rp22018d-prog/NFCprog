@@ -5,19 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NFC Collection</title>
     <link rel="stylesheet" href="style.css">
-
-    <!-- 全画面表示設定 -->
-     <link rel="manifest" href="manifest.json">
-
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
 </head>
 <body>
-    <h1>NFC システム</h1>
+    <h1>NFC コレクション</h1>
     
     <!-- NFC読み取り開始ボタン -->
     <button id="scanBtn">スキャン開始</button>
     <p id="status">ボタンを押してスキャンを開始してください</p>
 
-    <!-- 3x3のグリッド（そのまま） -->
+    <!-- 3x3のグリッド -->
     <div class="grid-container">
         <div class="box" id="box-1" data-id="1"></div>
         <div class="box" id="box-2" data-id="2"></div>
@@ -30,12 +29,15 @@
         <div class="box" id="box-9" data-id="9"></div>
     </div>
 
-    <!-- リセットボタンを削除（裏コマンド化） -->
-
-    <!-- コンプリート後に表示される「最後の試練へ」ボタン -->
+    <!-- コンプリート後に表示される「最後の試練」エリア -->
     <div id="final-challenge-area" class="hidden" style="margin-top: 30px;">
         <p>全ての記憶が集まった...</p>
         <button id="open-quiz-btn" class="challenge-btn">最後の試練に挑む</button>
+    </div>
+
+    <!-- リタイアボタン（一番下などに配置） -->
+    <div id="retire-area" style="margin-top: 40px; margin-bottom: 20px;">
+        <button onclick="retireGame()" style="background:#555; font-size:12px;">リタイアして結果を見る</button>
     </div>
 
     <!-- コンプリート時のお祝い画面 -->
@@ -47,22 +49,12 @@
         </div>
     </div>
 
-    <!-- ヒント表示用の画面（既存） -->
-    <div id="hint-overlay" class="overlay hidden" onclick="closeHint()">
-        <div class="overlay-content" onclick="event.stopPropagation()">
-            <h2>💡 ヒント</h2>
-            <p id="hint-text">ヒント</p>
-            <button onclick="closeHint()">閉じる</button>
-        </div>
-    </div>
-
     <!-- クイズ画面 -->
     <div id="quiz-overlay" class="overlay hidden">
         <div class="overlay-content quiz-content">
             <h2>📜 最後の試練</h2>
             <p class="quiz-instruction">空白を埋めて文章を完成させよ</p>
             
-            <!-- クイズの文章（虫食い） -->
             <div id="quiz-text-area">
                 <p>
                     我々は <select id="q1"><option value="">???</option><option value="wrong">未来</option><option value="correct">過去</option><option value="wrong">宇宙</option></select> から来た探検隊である。
@@ -72,8 +64,32 @@
                 </p>
             </div>
 
-            <button onclick="checkQuiz()" class="challenge-btn" style="margin-top:20px;">回答する</button>
+            <button id="quiz-answer-btn" onclick="checkQuiz()" class="challenge-btn" style="margin-top:20px;">回答する</button>
             <button onclick="closeQuiz()" style="margin-top:10px; background:#666;">閉じる</button>
+        </div>
+    </div>
+
+    <!-- リザルト画面 -->
+    <div id="result-overlay" class="overlay hidden">
+        <div class="overlay-content">
+            <h2>📊 結果発表 📊</h2>
+            <div style="text-align:left; display:inline-block; margin: 20px 0;">
+                <p>獲得数： <span id="res-count" style="font-weight:bold; font-size:20px;">0</span> / 9 個</p>
+                <p>タイム： <span id="res-time" style="font-weight:bold; font-size:20px;">--:--</span></p>
+            </div>
+            <hr>
+            <p id="res-rank" style="font-size: 24px; font-weight: bold; color: #d32f2f; margin: 10px 0;">ランク判定中...</p>
+            <p id="res-comment">コメント</p>
+            <button onclick="closeResult()">閉じる</button>
+        </div>
+    </div>
+
+    <!-- ヒント表示用の画面 -->
+    <div id="hint-overlay" class="overlay hidden" onclick="closeHint()">
+        <div class="overlay-content" onclick="event.stopPropagation()">
+            <h2>💡 ヒント</h2>
+            <p id="hint-text">ヒント</p>
+            <button onclick="closeHint()">閉じる</button>
         </div>
     </div>
 

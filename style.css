@@ -186,3 +186,11 @@ select.wrong-answer {
     background-color: #ffcdd2;
     border-color: #c62828;
 }
+
+/* 無効化されたボタン */
+button:disabled {
+    background-color: #aaa !important; /* 強制的に灰色 */
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none !important; /* アニメーション停止 */
+}

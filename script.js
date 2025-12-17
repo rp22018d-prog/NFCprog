@@ -1,44 +1,47 @@
-// ★ログを表示する機能（犯人特定用）
+// ログ表示機能
 function log(msg) {
     const logDiv = document.getElementById('debug-log');
-    // デバッグ用エリアを表示する
-    logDiv.style.display = 'block';
-    
-    const p = document.createElement('div');
-    p.textContent = new Date().toLocaleTimeString() + ': ' + msg;
-    logDiv.prepend(p); // 新しいものを上に追加
+    if(logDiv) {
+        logDiv.style.display = 'block';
+        const p = document.createElement('div');
+        p.textContent = new Date().toLocaleTimeString().split(' ')[0] + ': ' + msg;
+        logDiv.prepend(p);
+    }
     console.log(msg);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    log("プログラム開始 v2"); // 画面に出れば新しいコードが動いている証拠
+    log("プログラム起動 (1回だけ表示されるはず)");
     loadState(); 
 
     const scanBtn = document.getElementById('scanBtn');
     const statusMsg = document.getElementById('status');
-    let lastScanTime = 0;
+    
+    // ★現在処理中のIDを記録しておく変数
+    let processingId = null;
 
     scanBtn.addEventListener('click', async () => {
-        log("スキャンボタン押下");
+        // ★ボタンを一度押したら無効化して、リーダーを多重起動させない
+        scanBtn.disabled = true;
+        scanBtn.textContent = "スキャン待機中...";
+
+        log("スキャン開始");
+        
         try {
             const ndef = new NDEFReader();
             await ndef.scan();
             statusMsg.textContent = "タグをタッチしてください...";
-            log("スキャン待機中...");
 
             ndef.onreading = event => {
-                const now = Date.now();
-                // 時間差チェック
-                if (now - lastScanTime < 2000) {
-                    log("【ブロック】短時間の連打を無視しました");
-                    return; 
-                }
-                lastScanTime = now;
-
                 const decoder = new TextDecoder();
                 for (const record of event.message.records) {
                     const text = decoder.decode(record.data);
-                    log("読み取りデータ: " + text); // ★ここでタグの中身が見えます
+                    
+                    // ★「今まさに処理しているID」と同じなら、完全に無視！
+                    if (processingId === text) {
+                        log(`ID:${text} は処理中なので無視`);
+                        return;
+                    }
 
                     if (text >= 1 && text <= 9) {
                         handleTagFound(text);
@@ -49,24 +52,30 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         } catch (error) {
             statusMsg.textContent = "エラー: " + error;
-            log("エラー発生: " + error);
+            log("エラー: " + error);
+            // エラー時だけボタンを復活させる
+            scanBtn.disabled = false;
         }
     });
 
     function handleTagFound(id) {
         const box = document.getElementById(`box-${id}`);
         
-        // すでに埋まっている場合
+        // 既に持っているタグをスキャンした場合
         if (box.classList.contains('filled')) {
-            log(`ID:${id} は既に登録済み。移動します。`);
+            log(`ID:${id} (所持済) -> 移動`);
             window.location.href = `detail.html?id=${id}`;
             return;
         }
 
-        log(`ID:${id} の新規登録処理を開始`);
+        // --- 新規取得の処理 ---
+
+        // ★ロックをかける（これでもう同じIDは受け付けない）
+        processingId = id;
+        log(`ID:${id} 新規獲得！演出開始`);
 
         // 画像表示
-        box.innerHTML = `<img src="images/img${id}.png" alt="Image ${id}">`;
+        box.innerHTML = `<img src="images/img${id}.jpg" alt="Image ${id}">`;
         box.classList.add('filled');
         box.classList.add('flash-effect');
 
@@ -75,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // コンプリート判定
         const collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
         if (collected.length >= 9) {
-            log("コンプリート！演出を表示");
+            log("コンプリート演出！");
             const overlay = document.getElementById('complete-overlay');
             overlay.classList.remove('hidden');
             document.getElementById('goto-detail-btn').onclick = () => {
@@ -84,10 +93,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return; 
         }
 
-        log("1.5秒後に移動予約しました...");
-        // 1.5秒後に移動
+        // 通常移動
+        log("1.5秒待機中...");
         setTimeout(() => {
-            log("時間経過。移動します！");
+            log("移動実行");
             window.location.href = `detail.html?id=${id}`;
         }, 1500);
     }
@@ -105,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         collected.forEach(id => {
             const box = document.getElementById(`box-${id}`);
             if (box) {
-                box.innerHTML = `<img src="images/img${id}.png" alt="Image ${id}">`;
+                box.innerHTML = `<img src="images/img${id}.jpg" alt="Image ${id}">`;
                 box.classList.add('filled');
                 box.onclick = () => {
                     window.location.href = `detail.html?id=${id}`;

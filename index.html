@@ -11,7 +11,7 @@
     <!-- ログ表示 -->
     <div id="debug-log" style="border:1px solid red; padding:5px; font-size:12px; height:100px; overflow:scroll; display:none;"></div>
     
-    <!-- NFC読み取り開始ボタン（ユーザーの操作が必要なため） -->
+    <!-- NFC読み取り開始ボタン -->
     <button id="scanBtn">スキャン開始</button>
     <p id="status">ボタンを押してスキャンを開始してください</p>
 
@@ -29,7 +29,7 @@
         <div class="box" id="box-9" data-id="9"></div>
     </div>
 
-    <!-- デバッグ用：データをリセットするボタン -->
+    <!-- デバッグ用：リセットボタン -->
     <button onclick="localStorage.clear(); location.reload();" style="margin-top: 20px; font-size: 10px;">リセット</button>
 
     <!-- コンプリート時のお祝い画面 -->
@@ -41,9 +41,7 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
-</body>
-    <!-- ?v=2 をつけることで、スマホに「新しいやつだから再読込して！」と命令します -->
-    <script src="script.js?v=2"></script>
+    <!-- ★修正箇所：スクリプトはここで1回だけ読み込む（v=3に変更） -->
+    <script src="script.js?v=3"></script>
 </body>
 </html>

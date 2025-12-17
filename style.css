@@ -117,7 +117,7 @@ button {
     100% { transform: scale(1); opacity: 1; }
 }
 
-/* /* ヒント画面だけ色を変える場合 */
+/* ヒント画面だけ色を変える場合 */
 #hint-overlay .overlay-content {
     background: linear-gradient(135deg, #fff 0%, #87CEFA 100%); /*水色グラデ*/
     box-shadow: 0 0 20px rgba(135, 206, 250, 0.8);

@@ -105,7 +105,7 @@ function handleTagFound(id) {
             // 下の「最後の試練」ボタンも表示しておく（戻ってきたとき用）
             document.getElementById('final-challenge-area').classList.remove('hidden');
             
-            // ★追加：お祝い画面のボタンを押したら、そのタグの解説へ飛ぶ設定！
+            // お祝い画面のボタンを押したら、そのタグの解説へ飛ぶ設定
             document.getElementById('complete-detail-btn').onclick = () => {
                 window.location.href = `detail.html?id=${id}`;
             };
@@ -117,7 +117,7 @@ function handleTagFound(id) {
     // 通常移動（コンプリート以外）
     setTimeout(() => {
         window.location.href = `detail.html?id=${id}`;
-    }, 1500);
+    }, 1000);
 }
 
 // 初期読み込み時にコンプリートしているか確認
@@ -155,8 +155,6 @@ window.checkQuiz = function() {
 
     if (isAllCorrect) {
         alert("🎉 大正解！\n真のエンディングへ到達しました！");
-        // ここで真のエンディングページへ飛ばしたりできます
-        // window.location.href = "true_ending.html";
         document.getElementById('quiz-overlay').classList.add('hidden');
     } else {
         alert("不正解があります。もう一度考えてみよう！");
@@ -167,7 +165,6 @@ window.closeQuiz = function() {
     document.getElementById('quiz-overlay').classList.add('hidden');
 }
 
-// ...以下 setupBoxes, showHint, closeHint, saveState, loadState はそのまま...
 function setupBoxes() {
     for (let i = 1; i <= 9; i++) {
         const box = document.getElementById(`box-${i}`);

@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>NFC コレクション</h1>
+    <h1>NFC システム</h1>
     
     <!-- NFC読み取り開始ボタン -->
     <button id="scanBtn">スキャン開始</button>
@@ -26,15 +26,15 @@
         <div class="box" id="box-9" data-id="9"></div>
     </div>
 
-    <!-- ★変更：リセットボタンを削除しました（裏コマンド化） -->
+    <!-- リセットボタンを削除（裏コマンド化） -->
 
-    <!-- ★追加：コンプリート後に表示される「最後の試練へ」ボタン -->
+    <!-- コンプリート後に表示される「最後の試練へ」ボタン -->
     <div id="final-challenge-area" class="hidden" style="margin-top: 30px;">
         <p>全ての記憶が集まった...</p>
         <button id="open-quiz-btn" class="challenge-btn">最後の試練に挑む</button>
     </div>
 
-    <!-- コンプリート時のお祝い画面（既存・少し修正） -->
+    <!-- コンプリート時のお祝い画面 -->
     <div id="complete-overlay" class="overlay hidden">
         <div class="overlay-content">
             <h2>🎉 コンプリート！ 🎉</h2>
@@ -52,7 +52,7 @@
         </div>
     </div>
 
-    <!-- ★追加：クイズ画面 -->
+    <!-- クイズ画面 -->
     <div id="quiz-overlay" class="overlay hidden">
         <div class="overlay-content quiz-content">
             <h2>📜 最後の試練</h2>
@@ -74,6 +74,6 @@
     </div>
 
     <!-- キャッシュ対策 -->
-    <script src="script.js?v=6"></script>
+    <script src="script.js?v=7"></script>
 </body>
 </html>

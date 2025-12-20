@@ -11,6 +11,14 @@ const hints = {
     9: "9番のヒント：一番奥の部屋。",
 };
 
+// はずれタグのデータ（ID: "文章"）
+const hazureData = {
+    10: "残念！これはダミーのタグだ。",
+    11: "空っぽの宝箱を見つけた...",
+    12: "罠だ！...でも何も起きないようだ。",
+    13: "ただの石ころのようだ。"
+};
+
 // 効果音
 const audioScan = new Audio('sounds/scan.mp3');
 const audioComplete = new Audio('sounds/complete.mp3'); 
@@ -24,9 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupBoxes();
     setupHiddenReset();
     checkGameStatus(); // ★ゲームが終了しているかチェック
-
-    // 初回訪問チェック
-    checkFirstVisit();
 
     const scanBtn = document.getElementById('scanBtn');
     const statusMsg = document.getElementById('status');
@@ -59,6 +64,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (text >= 1 && text <= 9) {
                         handleTagFound(text);
+                    } else if (hazureData[text]) {
+                        // ★データに登録がある番号は「はずれ演出」
+                        showHazure(text);
+                    } else {
+                        // 登録してない番号
+                        statusMsg.textContent = "未対応のタグ: " + text;
                     }
                 }
             };
@@ -278,6 +289,9 @@ window.checkQuiz = function() {
     }
 }
 
+// ... setupBoxes, showHint, closeHint, closeQuiz, saveState, loadState, setupHiddenReset ...
+// （これらの関数は変更なしでそのまま下に置いてください）
+
 function setupBoxes() {
     for (let i = 1; i <= 9; i++) {
         const box = document.getElementById(`box-${i}`);
@@ -340,18 +354,23 @@ function setupHiddenReset() {
     };
 }
 
-// 初回訪問チェック関数
-function checkFirstVisit() {
-    // 'nfc_visited' という記録がない場合 ＝ 初めてのアクセス
-    if (!localStorage.getItem('nfc_visited')) {
-        document.getElementById('intro-overlay').classList.remove('hidden');
+// はずれ演出
+function showHazure(id) {
+    processingId = id; // 連打防止ロック
+
+    // スマホを振動させる（対応機種のみ）
+    if (navigator.vibrate) {
+        navigator.vibrate(200); // ブルッと震える
     }
+
+    // 文章をセットして表示
+    const msg = hazureData[id] || "ハズレです";
+    document.getElementById('hazure-text').textContent = msg;
+    document.getElementById('hazure-overlay').classList.remove('hidden');
 }
 
-// ガイドを閉じる関数（HTMLのボタンから呼ばれる）
-window.closeIntro = function() {
-    document.getElementById('intro-overlay').classList.add('hidden');
-    
-    // 「もう来たことがあるよ」という記録を残す
-    localStorage.setItem('nfc_visited', 'true');
+// はずれ画面を閉じる
+window.closeHazure = function() {
+    document.getElementById('hazure-overlay').classList.add('hidden');
+    processingId = null; // ロック解除（またスキャンできるようにする）
 }

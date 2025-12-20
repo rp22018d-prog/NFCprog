@@ -33,6 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setupHiddenReset();
     checkGameStatus(); // ★ゲームが終了しているかチェック
 
+    // 初回訪問チェック
+    checkFirstVisit();
+
     const scanBtn = document.getElementById('scanBtn');
     const statusMsg = document.getElementById('status');
     
@@ -352,6 +355,22 @@ function setupHiddenReset() {
         }
         setTimeout(() => clickCount = 0, 1000);
     };
+}
+
+// 初回訪問チェック関数
+function checkFirstVisit() {
+    // 'nfc_visited' という記録がない場合 ＝ 初めてのアクセス
+    if (!localStorage.getItem('nfc_visited')) {
+        document.getElementById('intro-overlay').classList.remove('hidden');
+    }
+}
+
+// ガイドを閉じる関数（HTMLのボタンから呼ばれる）
+window.closeIntro = function() {
+    document.getElementById('intro-overlay').classList.add('hidden');
+    
+    // 「もう来たことがあるよ」という記録を残す
+    localStorage.setItem('nfc_visited', 'true');
 }
 
 // はずれ演出

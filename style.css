@@ -297,7 +297,7 @@ button:disabled {
 }
 
 /* ガイド画面だけ色を変える場合 */
-/* #intro-overlay .overlay-content {
+#intro-overlay .overlay-content {
     background: linear-gradient(135deg, #fff 0%, #bbffb2 100%);
-    box-shadow: 0 0 20px rgba(135, 206, 250, 0.8); */
-/* } */
+    box-shadow: 0 0 20px rgba(135, 206, 250, 0.8);
+}

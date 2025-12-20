@@ -278,9 +278,6 @@ window.checkQuiz = function() {
     }
 }
 
-// ... setupBoxes, showHint, closeHint, closeQuiz, saveState, loadState, setupHiddenReset ...
-// （これらの関数は変更なしでそのまま下に置いてください）
-
 function setupBoxes() {
     for (let i = 1; i <= 9; i++) {
         const box = document.getElementById(`box-${i}`);

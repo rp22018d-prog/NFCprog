@@ -1,5 +1,33 @@
-/* --- レイアウト変更 --- */
+body {
+    font-family: sans-serif;
+    text-align: center;
+    background-color: #f0f0f0;
+    padding: 20px;
+}
 
+h1 {
+    user-select: none; /* 連打しても文字選択されないように */
+}
+
+/* スキャンボタン */
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+button:disabled {
+    background-color: #aaa !important;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* --- メインエリア --- */
 .main-display-area {
     margin: 20px auto;
     max-width: 400px;
@@ -7,22 +35,19 @@
 
 /* 1. 大きなスタンプ台 */
 #stamp-stage {
-    width: 300px;  /* 台紙のサイズ */
+    width: 300px;
     height: 300px;
     margin: 0 auto;
     background-color: #fff;
     border: 4px solid #333;
     border-radius: 10px;
-    position: relative; /* 画像を重ねるために必要 */
+    position: relative;
     overflow: hidden;
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    
-    /* 台紙っぽいテクスチャ（任意） */
     background-image: radial-gradient(#ddd 1px, transparent 1px);
     background-size: 20px 20px;
 }
 
-/* プレースホルダー文字 */
 .placeholder-text {
     position: absolute;
     top: 50%;
@@ -41,12 +66,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* または contain */
-    
-    /* ★重要：画像を「乗算」で重ねる（白い部分が透ける） */
-    mix-blend-mode: multiply; 
-    
-    /* アニメーション */
+    object-fit: cover;
+    mix-blend-mode: multiply; /* 乗算 */
     opacity: 0;
     animation: stampIn 0.5s ease-out forwards;
 }
@@ -60,7 +81,7 @@
 /* 2. インジケーター（下のボタン群） */
 .indicator-container {
     display: grid;
-    grid-template-columns: repeat(9, 1fr); /* 9個並べる */
+    grid-template-columns: repeat(9, 1fr);
     gap: 5px;
     margin-top: 15px;
 }
@@ -69,7 +90,7 @@
     aspect-ratio: 1 / 1;
     background-color: #ddd;
     color: #555;
-    border-radius: 50%; /* 丸くする */
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -81,146 +102,51 @@
 
 /* 埋まった時のボタンデザイン */
 .indicator.filled {
-    background-color: #ffd700; /* 金色 */
+    background-color: #ffd700;
     color: #333;
     border: 2px solid #b28900;
     transform: scale(1.1);
 }
 
-/* --- (以下、前回までのCSSはそのまま残してください) --- */
-/* body, button, .overlay などのスタイルはそのまま使います */
-
-/* 既存の .grid-container, .box 関連は削除してOKですが、
-   残しておいても影響はありません */
-
-body {
-    font-family: sans-serif;
-    text-align: center;
-    background-color: #f0f0f0;
-    padding: 20px;
-}
-
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3列 */
-    gap: 10px;
-    max-width: 400px;
-    margin: 20px auto;
-}
-
-.box {
-    aspect-ratio: 1 / 1; /* 正方形にする */
-    background-color: #f0f0f0;
-    /* 画像を指定 */
-    background-image: url(images/placeholder.png);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-
-    border: 2px solid #bbb;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-    transition: transform 0.3s;
-}
-
-/* 画像が入ったときのスタイル */
-.box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-/* 演出用のアニメーションクラス */
-.flash-effect {
-    animation: flash 1s ease-out;
-    border-color: gold;
-    transform: scale(1.1);
-    z-index: 10;
-}
-
-@keyframes flash {
-    0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); background-color: #fff; }
-    70% { box-shadow: 0 0 0 20px rgba(255, 215, 0, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
-}
-
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #333;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-}
-
-.filled{
-    cursor: pointer;
-}
-
-/* お祝い画面（全体を覆う） */
+/* --- オーバーレイ --- */
 .overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.85); /* 背景を暗く */
+    background-color: rgba(0, 0, 0, 0.85);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 100;
-    opacity: 1;
-    transition: opacity 0.5s;
 }
 
-/* 隠すためのクラス */
 .hidden {
     display: none !important;
 }
 
-/* お祝いメッセージの箱 */
 .overlay-content {
-    background: linear-gradient(135deg, #fff 0%, #ffd700 100%); /* 金色グラデ */
+    background: linear-gradient(135deg, #fff 0%, #ffd700 100%);
     padding: 30px;
     border-radius: 15px;
     text-align: center;
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-    animation: popUp 0.5s ease-out;
+    width: 80%;
+    max-width: 400px;
 }
 
-.overlay-content h2 {
-    color: #d32f2f;
-    font-size: 24px;
-    margin-bottom: 10px;
+/* クイズ関連 */
+.quiz-content {
+    background: #fff;
+    text-align: center;
 }
-
-.overlay-content p {
-    font-weight: bold;
+#quiz-text-area {
+    text-align: left;
     margin-bottom: 20px;
 }
-
-/* ポップアップのアニメーション */
-@keyframes popUp {
-    0% { transform: scale(0.5); opacity: 0; }
-    80% { transform: scale(1.1); }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-/* ヒント画面だけ色を変える場合 */
-#hint-overlay .overlay-content {
-    background: linear-gradient(135deg, #fff 0%, #87CEFA 100%); /*水色グラデ*/
-    box-shadow: 0 0 20px rgba(135, 206, 250, 0.8);
-}
-
-/* 最後の試練ボタン */
 .challenge-btn {
-    background-color: #d32f2f; /* 赤色 */
+    background-color: #d32f2f;
     color: white;
     font-weight: bold;
     padding: 15px 30px;
@@ -229,38 +155,12 @@ button {
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     animation: pulse 2s infinite;
 }
-
 @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.05); }
     100% { transform: scale(1); }
 }
 
-/* クイズ画面の調整 */
-.quiz-content {
-    background: #fff;
-    max-width: 90%;
-    width: 400px;
-    text-align: center;
-    line-height: 1.8;
-}
-
-.quiz-instruction {
-    text-align: center;
-    font-weight: bold;
-    color: #555;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 10px;
-}
-
-/* 文章だけ左寄せ */
-#quiz-text-area{
-    text-align: left;
-    margin-bottom: 20px;
-}
-
-/* 虫食いのプルダウン */
 select {
     font-size: 16px;
     padding: 5px;
@@ -268,13 +168,10 @@ select {
     border-radius: 5px;
     background-color: #e3f2fd;
     color: #0d47a1;
-    cursor: pointer;
+    margin: 0 5px;
 }
-
-/* 正解・不正解の演出用 */
 select.correct-answer {
     background-color: #c8e6c9;
-    border-color: #2e7d32;
     color: #2e7d32;
 }
 select.wrong-answer {
@@ -282,41 +179,18 @@ select.wrong-answer {
     border-color: #c62828;
 }
 
-/* 無効化されたボタン */
-button:disabled {
-    background-color: #aaa !important; /* 強制的に灰色 */
-    cursor: not-allowed;
-    opacity: 0.7;
-    transform: none !important; /* アニメーション停止 */
-}
-
-/* --- リザルト画面のスペシャルデザイン --- */
-
-/* リザルト画面の箱 */
+/* リザルト画面デザイン */
 #result-overlay .overlay-content {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); /* 濃い紺色のグラデ */
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
     color: #fff;
-    border: 4px solid #ffd700; /* 金色の枠線 */
+    border: 4px solid #ffd700;
     box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
-    padding: 30px 20px;
-    max-width: 90%;
-    width: 350px;
-    border-radius: 20px;
-    text-align: center;
 }
-
-/* タイトル「結果発表」 */
 #result-overlay h2 {
     color: #ffd700;
     font-size: 28px;
-    margin-bottom: 20px;
-    letter-spacing: 2px;
     text-shadow: 2px 2px 0 #000;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
-    padding-bottom: 10px;
 }
-
-/* スコア表示エリア */
 .result-stats {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
@@ -324,75 +198,34 @@ button:disabled {
     margin-bottom: 20px;
     text-align: left;
 }
-
 .result-stats p {
     font-size: 16px;
     margin: 5px 0;
     display: flex;
     justify-content: space-between;
 }
-
-/* 数字の強調 */
 .result-stats span {
-    font-family: "Courier New", monospace; /* デジタルっぽいフォント */
+    font-family: "Courier New", monospace;
     font-size: 22px;
     font-weight: bold;
-    color: #00e5ff; /* 水色 */
+    color: #00e5ff;
 }
-
-/* ランク表示（ドーンと大きく！） */
 #res-rank {
-    font-size: 80px; /* 超巨大 */
+    font-size: 80px;
     font-weight: 900;
     margin: 10px 0;
-    line-height: 1;
     text-shadow: 4px 4px 0 rgba(0,0,0,0.5);
-    animation: bounceIn 1s cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    animation: bounceIn 1s;
 }
+.rank-ss { color: #ff00de; text-shadow: 0 0 20px #ff00de; }
+.rank-s  { color: #ffd700; text-shadow: 0 0 20px #ffd700; }
+.rank-a  { color: #ff5252; text-shadow: 0 0 10px #ff5252; }
+.rank-b  { color: #448aff; }
+.rank-c  { color: #b0bec5; }
 
-/* ランクごとの色（JSでクラスを付け替えます） */
-.rank-ss { color: #ff00de; text-shadow: 0 0 20px #ff00de; } /* ネオンピンク */
-.rank-s  { color: #ffd700; text-shadow: 0 0 20px #ffd700; } /* 金色 */
-.rank-a  { color: #ff5252; text-shadow: 0 0 10px #ff5252; } /* 赤 */
-.rank-b  { color: #448aff; } /* 青 */
-.rank-c  { color: #b0bec5; } /* グレー */
-
-/* コメント */
-#res-comment {
-    font-style: italic;
-    color: #ddd;
-    margin-bottom: 25px;
-    font-size: 14px;
-}
-
-/* 閉じるボタン */
-#result-overlay button {
-    background: linear-gradient(to bottom, #ffd700, #ffb300);
-    color: #333;
-    border: none;
-    padding: 12px 40px;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 50px;
-    box-shadow: 0 4px 0 #b28900;
-    transition: transform 0.1s;
-}
-
-#result-overlay button:active {
-    transform: translateY(4px);
-    box-shadow: none;
-}
-
-/* ランクが出現するアニメーション */
 @keyframes bounceIn {
     0% { transform: scale(0.3); opacity: 0; }
     50% { transform: scale(1.05); }
     70% { transform: scale(0.9); }
     100% { transform: scale(1); opacity: 1; }
-}
-
-/* ガイド画面だけ色を変える場合 */
-#intro-overlay .overlay-content {
-    background: linear-gradient(135deg, #fff 0%, #bbffb2 100%);
-    box-shadow: 0 0 20px rgba(135, 206, 250, 0.8);
 }

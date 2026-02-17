@@ -12,79 +12,86 @@
 <body>
     <h1>NFC システム</h1>
     
-    <!-- NFC読み取り開始ボタン -->
+    <!-- スキャンボタン -->
     <button id="scanBtn">スキャン開始</button>
     <p id="status">ボタンを押してスキャンを開始してください</p>
 
-    <!-- 3x3のグリッド -->
-    <div class="grid-container">
-        <div class="box" id="box-1" data-id="1"></div>
-        <div class="box" id="box-2" data-id="2"></div>
-        <div class="box" id="box-3" data-id="3"></div>
-        <div class="box" id="box-4" data-id="4"></div>
-        <div class="box" id="box-5" data-id="5"></div>
-        <div class="box" id="box-6" data-id="6"></div>
-        <div class="box" id="box-7" data-id="7"></div>
-        <div class="box" id="box-8" data-id="8"></div>
-        <div class="box" id="box-9" data-id="9"></div>
+    <!-- ★変更：ここからメインエリア -->
+    <div class="main-display-area">
+        
+        <!-- ① 大きなスタンプ台（画像が重なる場所） -->
+        <div id="stamp-stage">
+            <!-- ここに画像（imgタグ）がJavaScriptで追加されます -->
+            <div class="placeholder-text">スタンプ台紙</div>
+        </div>
+
+        <!-- ② 1〜9のインジケーター（ヒント/解説用ボタン） -->
+        <div class="indicator-container">
+            <!-- 1〜9のボタン -->
+            <div class="indicator" id="box-1" data-id="1">1</div>
+            <div class="indicator" id="box-2" data-id="2">2</div>
+            <div class="indicator" id="box-3" data-id="3">3</div>
+            <div class="indicator" id="box-4" data-id="4">4</div>
+            <div class="indicator" id="box-5" data-id="5">5</div>
+            <div class="indicator" id="box-6" data-id="6">6</div>
+            <div class="indicator" id="box-7" data-id="7">7</div>
+            <div class="indicator" id="box-8" data-id="8">8</div>
+            <div class="indicator" id="box-9" data-id="9">9</div>
+        </div>
+
+    </div>
+    <!-- ★変更ここまで -->
+
+    <!-- コンプリート後のボタン -->
+    <div id="final-challenge-area" class="hidden" style="margin-top: 20px;">
+        <p>全ての記憶が集まった...</p>
+        <button id="open-quiz-btn" class="challenge-btn">最後の試練に挑む</button>
     </div>
 
-    <!-- コンプリート後に表示される「最後の試練」エリア -->
-    <div id="final-challenge-area" class="hidden" style="margin-top: 30px;">
-        <p>全てのタグが集まった...</p>
-        <button id="open-quiz-btn" class="challenge-btn">最後の問題に挑む</button>
-    </div>
-
-    <!-- リタイアボタン（一番下などに配置） -->
-    <div id="retire-area" style="margin-top: 40px; margin-bottom: 20px;">
+    <!-- リタイアエリア -->
+    <div id="retire-area" style="margin-top: 30px; margin-bottom: 20px;">
         <button onclick="retireGame()" style="background:#555; font-size:12px;">リタイアして結果を見る</button>
     </div>
 
-    <!-- コンプリート時のお祝い画面 -->
+    <!-- ここから下のオーバーレイ（ポップアップ）類はそのまま -->
     <div id="complete-overlay" class="overlay hidden">
         <div class="overlay-content">
             <h2>🎉 コンプリート！ 🎉</h2>
-            <p>全てのタグを集めました！</p>
+            <p>全てのスタンプが重なりました！</p>
             <button id="complete-detail-btn">最後の解説を見る</button>
         </div>
     </div>
 
-    <!-- クイズ画面 -->
     <div id="quiz-overlay" class="overlay hidden">
         <div class="overlay-content quiz-content">
-            <h2>📜 最後の問題</h2>
+            <h2>📜 最後の試練</h2>
             <p class="quiz-instruction">空白を埋めて文章を完成させよ</p>
-            
             <div id="quiz-text-area">
                 <p>
-                    これは <select id="q1"><option value="">???</option><option value="wrong">完成</option><option value="correct">デモ</option><option value="wrong">完璧</option></select> である。
-                    すべてのタグをスキャンした後に <select id="q2"><option value="">???</option><option value="correct">問題</option><option value="wrong">解答</option><option value="wrong">スマホ</option></select> を解くことで、
-                    9つの内容をより <select id="q3"><option value="">???</option><option value="wrong">雑</option><option value="wrong">大体</option><option value="correct">正確</option></select> に理解することができる。
-                    これにより、本を <select id="q4"><option value="">???</option><option value="correct">読まなく</option><option value="wrong">読ん</option><option value="wrong">捨て</option></select>ても学習ができる。
+                    我々は <select id="q1"><option value="">???</option><option value="wrong">未来</option><option value="correct">過去</option><option value="wrong">宇宙</option></select> から来た探検隊である。
+                    この遺跡に眠る <select id="q2"><option value="">???</option><option value="correct">秘宝</option><option value="wrong">爆弾</option><option value="wrong">スマホ</option></select> を見つけるために、
+                    9つの <select id="q3"><option value="">???</option><option value="wrong">石板</option><option value="wrong">鍵</option><option value="correct">カケラ</option></select> を集めた。
+                    今ここに、封印は <select id="q4"><option value="">???</option><option value="correct">解かれた</option><option value="wrong">砕かれた</option><option value="wrong">忘れられた</option></select>。
                 </p>
             </div>
-
             <button id="quiz-answer-btn" onclick="checkQuiz()" class="challenge-btn" style="margin-top:20px;">回答する</button>
             <button onclick="closeQuiz()" style="margin-top:10px; background:#666;">閉じる</button>
         </div>
     </div>
 
-    <!-- リザルト画面 -->
     <div id="result-overlay" class="overlay hidden">
         <div class="overlay-content">
-            <h2>📊 結果発表 📊</h2>
-            <div style="text-align:left; display:inline-block; margin: 20px 0;">
-                <p>獲得数： <span id="res-count" style="font-weight:bold; font-size:20px;">0</span> / 9 個</p>
-                <p>タイム： <span id="res-time" style="font-weight:bold; font-size:20px;">--:--</span></p>
+            <h2>🏆 結果発表 🏆</h2>
+            <div class="result-stats">
+                <p>獲得数 <span id="res-count">0 / 9</span></p>
+                <p>タイム <span id="res-time">--:--</span></p>
             </div>
-            <hr>
-            <p id="res-rank" style="font-size: 24px; font-weight: bold; color: #d32f2f; margin: 10px 0;">ランク判定中...</p>
+            <div id="res-rank">RANK</div>
             <p id="res-comment">コメント</p>
             <button onclick="closeResult()">閉じる</button>
         </div>
     </div>
 
-    <!-- ヒント表示用の画面 -->
     <div id="hint-overlay" class="overlay hidden" onclick="closeHint()">
         <div class="overlay-content" onclick="event.stopPropagation()">
             <h2>💡 ヒント</h2>
@@ -92,23 +99,7 @@
             <button onclick="closeHint()">閉じる</button>
         </div>
     </div>
-
-    <div id="intro-overlay" class="overlay hidden">
-        <div class="overlay-content">
-            <h2>🎮 遊び方ガイド</h2>
-            <div style="text-align: left; margin: 20px 10px; font-size: 15px; line-height: 1.8;">
-                <p>① <b>「スキャン開始」</b>ボタンを押す。</p>
-                <p>② スマホを<b>NFCタグ</b>にかざす。</p>
-                <p>③ 演出とともに画像GET！</p>
-                <p>④ <b>9個すべて</b>集めて謎を解こう！</p>
-                <hr style="margin: 10px 0; border: none; border-top: 1px solid rgba(255,255,255,0.3);">
-                <p style="font-size: 13px;">💡 空白のマスをタップすると<b>ヒント</b>が見れるよ！</p>
-            </div>
-            <button onclick="closeIntro()" class="challenge-btn" style="background: #e91e63;">スタート！</button>
-        </div>
-    </div>
-
-    <!-- ★追加：はずれ画面 -->
+    
     <div id="hazure-overlay" class="overlay hidden">
         <div class="overlay-content">
             <h2 style="color: #ff5252;">⚠ 残念！ ⚠</h2>
@@ -118,7 +109,19 @@
         </div>
     </div>
 
-    <!-- キャッシュ対策 -->
-    <script src="script.js?v=9"></script>
+    <div id="intro-overlay" class="overlay hidden">
+        <div class="overlay-content">
+            <h2>🎮 遊び方ガイド</h2>
+            <div style="text-align: left; margin: 20px 10px; font-size: 15px; line-height: 1.8;">
+                <p>① <b>「スキャン開始」</b>ボタンを押す。</p>
+                <p>② スマホを<b>NFCタグ</b>にかざす。</p>
+                <p>③ 中央の台紙にスタンプが重なっていくよ！</p>
+                <p>④ 下の数字をタップすると<b>ヒント</b>が見れるよ。</p>
+            </div>
+            <button onclick="closeIntro()" class="challenge-btn" style="background: #e91e63;">スタート！</button>
+        </div>
+    </div>
+
+    <script src="script.js?v=10"></script>
 </body>
 </html>

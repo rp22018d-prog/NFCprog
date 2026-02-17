@@ -1,3 +1,98 @@
+/* --- レイアウト変更 --- */
+
+.main-display-area {
+    margin: 20px auto;
+    max-width: 400px;
+}
+
+/* 1. 大きなスタンプ台 */
+#stamp-stage {
+    width: 300px;  /* 台紙のサイズ */
+    height: 300px;
+    margin: 0 auto;
+    background-color: #fff;
+    border: 4px solid #333;
+    border-radius: 10px;
+    position: relative; /* 画像を重ねるために必要 */
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    
+    /* 台紙っぽいテクスチャ（任意） */
+    background-image: radial-gradient(#ddd 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* プレースホルダー文字 */
+.placeholder-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #aaa;
+    font-weight: bold;
+    font-size: 18px;
+    z-index: 0;
+}
+
+/* 重ねる画像（スタンプレイヤー） */
+.stamp-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* または contain */
+    
+    /* ★重要：画像を「乗算」で重ねる（白い部分が透ける） */
+    mix-blend-mode: multiply; 
+    
+    /* アニメーション */
+    opacity: 0;
+    animation: stampIn 0.5s ease-out forwards;
+}
+
+@keyframes stampIn {
+    0% { transform: scale(1.5); opacity: 0; }
+    50% { transform: scale(0.9); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* 2. インジケーター（下のボタン群） */
+.indicator-container {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr); /* 9個並べる */
+    gap: 5px;
+    margin-top: 15px;
+}
+
+.indicator {
+    aspect-ratio: 1 / 1;
+    background-color: #ddd;
+    color: #555;
+    border-radius: 50%; /* 丸くする */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+/* 埋まった時のボタンデザイン */
+.indicator.filled {
+    background-color: #ffd700; /* 金色 */
+    color: #333;
+    border: 2px solid #b28900;
+    transform: scale(1.1);
+}
+
+/* --- (以下、前回までのCSSはそのまま残してください) --- */
+/* body, button, .overlay などのスタイルはそのまま使います */
+
+/* 既存の .grid-container, .box 関連は削除してOKですが、
+   残しておいても影響はありません */
+
 body {
     font-family: sans-serif;
     text-align: center;

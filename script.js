@@ -1,4 +1,4 @@
-// ヒント、はずれデータ、効果音設定などはそのまま...
+// --- データ定義 ---
 const hints = {
     1: "1番のヒント：入り口の近く。",
     2: "2番のヒント：赤い屋根の下。",
@@ -10,8 +10,15 @@ const hints = {
     8: "8番のヒント：ポスターのところ。",
     9: "9番のヒント：一番奥の部屋。",
 };
-const hazureData = { 10: "ダミーです", 11: "空っぽです" }; // 省略
 
+const hazureData = {
+    10: "残念！これはダミーのタグだ。",
+    11: "空っぽの宝箱を見つけた...",
+    12: "罠だ！...でも何も起きないようだ。",
+    13: "ただの石ころのようだ。"
+};
+
+// --- 音声設定 ---
 const audioScan = new Audio('sounds/scan.mp3');
 const audioComplete = new Audio('sounds/complete.mp3'); 
 audioScan.volume = 1.0;
@@ -19,25 +26,35 @@ audioComplete.volume = 1.0;
 
 let processingId = null;
 
+// --- 初期化処理 ---
 document.addEventListener('DOMContentLoaded', () => {
-    loadState(); 
-    setupIndicators(); // ★名前変更：setupBoxes -> setupIndicators
-    setupHiddenReset();
-    checkGameStatus();
-    checkFirstVisit();
-
-    const scanBtn = document.getElementById('scanBtn');
-    const statusMsg = document.getElementById('status');
+    // 重要な関数を順に実行
+    loadState();        // 1. 保存データの復元
+    setupIndicators();  // 2. ボタンのクリック設定
+    setupHiddenReset(); // 3. リセット機能設定
+    checkGameStatus();  // 4. ゲーム終了状態の確認
+    checkFirstVisit();  // 5. 初回訪問ガイド
     
+    // コンプリート状態ならボタン表示
     const collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
     if (collected.length >= 9) {
         document.getElementById('final-challenge-area').classList.remove('hidden');
     }
 
+    const scanBtn = document.getElementById('scanBtn');
+    const statusMsg = document.getElementById('status');
+    
+    // クイズボタンの設定
+    document.getElementById('open-quiz-btn').onclick = () => {
+        document.getElementById('quiz-overlay').classList.remove('hidden');
+    };
+
+    // スキャンボタンのイベント
     scanBtn.addEventListener('click', async () => {
-        // 音出し準備などはそのまま
+        // 音出し準備
         audioScan.play().then(() => audioScan.pause()).catch(e => {});
         audioScan.currentTime = 0;
+
         scanBtn.disabled = true;
         scanBtn.textContent = "スキャン待機中...";
         
@@ -50,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const decoder = new TextDecoder();
                 for (const record of event.message.records) {
                     const text = decoder.decode(record.data);
+                    
                     if (processingId === text) return;
 
                     if (text >= 1 && text <= 9) {
@@ -63,20 +81,16 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         } catch (error) {
             statusMsg.textContent = "エラー: " + error;
+            // ゲームが終わってなければボタン復活
             if (!localStorage.getItem('nfc_game_finished')) {
                 scanBtn.disabled = false;
             }
         }
     });
-
-    document.getElementById('open-quiz-btn').onclick = () => {
-        document.getElementById('quiz-overlay').classList.remove('hidden');
-    };
 });
 
-// ★大きく変更：タグが見つかった時の処理
+// --- メインロジック: タグ発見時 ---
 function handleTagFound(id) {
-    // 1. 下のインジケーターボタンを取得
     const indicator = document.getElementById(`box-${id}`);
     processingId = id;
 
@@ -88,20 +102,23 @@ function handleTagFound(id) {
             localStorage.setItem('nfc_start_time', Date.now());
         }
 
-        // ★変更点：スタンプ台に画像を追加する（重ねる）
+        // ★スタンプ画像を追加
         addStampImage(id);
-
+        
         // インジケーターを「済み」にする
         indicator.classList.add('filled');
         
+        // 保存
         saveState(id);
 
         // コンプリート判定
         const collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
         if (collected.length >= 9) {
+            // ファンファーレ再生
             audioComplete.currentTime = 0; 
             audioComplete.play().catch(e => {});
 
+            // お祝い画面表示
             const overlay = document.getElementById('complete-overlay');
             overlay.classList.remove('hidden');
             document.getElementById('final-challenge-area').classList.remove('hidden');
@@ -112,13 +129,13 @@ function handleTagFound(id) {
             return; 
         }
         
+        // 通常スキャン音
         audioScan.currentTime = 0; 
         audioScan.play().catch(e => {});
     } else {
-        // 既に持っている場合の演出（ボタンをピカッとさせるなど）
+        // 既読演出
         indicator.style.transform = "scale(1.5)";
         setTimeout(() => indicator.style.transform = "scale(1.1)", 300);
-        
         audioScan.currentTime = 0; 
         audioScan.play().catch(e => {});
     }
@@ -129,23 +146,26 @@ function handleTagFound(id) {
     }, 1500);
 }
 
-// ★追加：スタンプ台に画像を重ねる関数
+// --- スタンプ画像追加 ---
 function addStampImage(id) {
     const stage = document.getElementById('stamp-stage');
-    // imgタグを作成
+    // 既に同じIDの画像がないかチェック（重複防止）
+    if (document.getElementById(`stamp-img-${id}`)) return;
+
     const img = document.createElement('img');
     img.src = `images/img${id}.jpg`;
-    img.className = 'stamp-layer'; // CSSでアニメーションなどが設定されている
-    img.style.zIndex = id; // 番号順に重なるようにする
+    img.className = 'stamp-layer';
+    img.id = `stamp-img-${id}`; // IDをつけて管理
+    img.style.zIndex = id; // 番号順に重ねる
     stage.appendChild(img);
 }
 
-// ★変更：ボタンのクリックイベント設定
+// --- インジケーター設定 ---
 function setupIndicators() {
     for (let i = 1; i <= 9; i++) {
         const btn = document.getElementById(`box-${i}`);
+        if(!btn) continue;
         btn.onclick = () => {
-            // 埋まっているなら解説、埋まってないならヒント
             if (btn.classList.contains('filled')) {
                 window.location.href = `detail.html?id=${i}`;
             } else {
@@ -155,18 +175,22 @@ function setupIndicators() {
     }
 }
 
-// ★変更：ロード時の復元処理
+// --- 保存と復元 ---
+function saveState(id) {
+    let collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
+    if (!collected.includes(id)) {
+        collected.push(id);
+        localStorage.setItem('nfc_collection', JSON.stringify(collected));
+    }
+}
+
 function loadState() {
     let collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
-    
-    // 集めた順ではなく、番号順に描画したい場合はソートする
-    collected.sort((a, b) => a - b);
+    // 番号順にソートして描画
+    collected.sort((a, b) => parseInt(a) - parseInt(b));
 
     collected.forEach(id => {
-        // 1. スタンプ画像を復元
         addStampImage(id);
-        
-        // 2. ボタンの状態を復元
         const indicator = document.getElementById(`box-${id}`);
         if (indicator) {
             indicator.classList.add('filled');
@@ -174,5 +198,186 @@ function loadState() {
     });
 }
 
-// ... (showHint, showHazure, finishGame, showResult, saveState など他の関数は変更なし) ...
-// そのままコピーして使ってください
+// --- はずれ演出 ---
+function showHazure(id) {
+    processingId = id;
+    audioScan.currentTime = 0;
+    audioScan.play().catch(e => {});
+    if (navigator.vibrate) navigator.vibrate(200);
+
+    const msg = hazureData[id] || "ハズレです";
+    document.getElementById('hazure-text').textContent = msg;
+    document.getElementById('hazure-overlay').classList.remove('hidden');
+}
+
+window.closeHazure = function() {
+    document.getElementById('hazure-overlay').classList.add('hidden');
+    processingId = null;
+}
+
+// --- ヒント表示 ---
+function showHint(id) {
+    const hintText = hints[id] || "ヒントはありません";
+    document.getElementById('hint-text').innerText = hintText;
+    document.getElementById('hint-overlay').classList.remove('hidden');
+}
+
+window.closeHint = function() {
+    document.getElementById('hint-overlay').classList.add('hidden');
+}
+
+// --- ゲーム終了・リザルト関連 ---
+window.retireGame = function() {
+    if(!confirm("本当にリタイアして結果を見ますか？\n（これ以上タグを集められなくなります）")) return;
+    finishGame();
+}
+
+function finishGame() {
+    localStorage.setItem('nfc_game_finished', 'true');
+    if (!localStorage.getItem('nfc_end_time')) {
+        localStorage.setItem('nfc_end_time', Date.now());
+    }
+    checkGameStatus();
+    showResult();
+}
+
+function checkGameStatus() {
+    const isFinished = localStorage.getItem('nfc_game_finished');
+    const scanBtn = document.getElementById('scanBtn');
+    const retireArea = document.getElementById('retire-area');
+    const statusMsg = document.getElementById('status');
+
+    if (isFinished) {
+        scanBtn.disabled = true;
+        scanBtn.textContent = "受付終了";
+        scanBtn.style.backgroundColor = "#aaa";
+        statusMsg.textContent = "お疲れ様でした！解説ページは引き続き閲覧可能です。";
+
+        if (retireArea) {
+            retireArea.style.display = 'block';
+            const retireBtn = retireArea.querySelector('button');
+            if (retireBtn) {
+                retireBtn.textContent = "結果を見る";
+                retireBtn.onclick = showResult;
+                retireBtn.style.background = "#2196f3";
+            }
+        }
+        
+        const quizBtn = document.getElementById('quiz-answer-btn');
+        if(quizBtn) {
+            quizBtn.textContent = "結果を見る";
+            quizBtn.onclick = showResult;
+            quizBtn.classList.remove('challenge-btn');
+            quizBtn.style.background = "#2196f3";
+        }
+    }
+}
+
+function showResult() {
+    const collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
+    const startTime = parseInt(localStorage.getItem('nfc_start_time') || Date.now());
+    const endTime = parseInt(localStorage.getItem('nfc_end_time') || Date.now());
+
+    let diffSeconds = Math.floor((endTime - startTime) / 1000);
+    if (diffSeconds < 0) diffSeconds = 0;
+    const minutes = Math.floor(diffSeconds / 60);
+    const seconds = diffSeconds % 60;
+    const timeStr = `${minutes}分${seconds.toString().padStart(2, '0')}秒`;
+
+    let rank = "C";
+    let comment = "次はもっと集めよう！";
+    const count = collected.length;
+
+    if (count === 9) {
+        rank = "S";
+        comment = "完璧です！伝説の探検家！";
+        if (minutes < 10) { 
+            rank = "SS";
+            comment = "神速の探検家！！凄すぎる！";
+        }
+    } else if (count >= 7) {
+        rank = "A";
+        comment = "素晴らしい成果です！";
+    } else if (count >= 4) {
+        rank = "B";
+        comment = "なかなかやりますね！";
+    }
+
+    const contentBox = document.getElementById('result-content-area');
+    contentBox.innerHTML = `
+        <div class="result-stats">
+            <p>獲得数 <span>${count} / 9</span></p>
+            <p>タイム <span>${timeStr}</span></p>
+        </div>
+        <div id="res-rank" class="rank-${rank.toLowerCase()}">${rank}</div>
+        <p id="res-comment">${comment}</p>
+        <button onclick="closeResult()">閉じる</button>
+    `;
+
+    document.getElementById('result-overlay').classList.remove('hidden');
+    document.getElementById('quiz-overlay').classList.add('hidden');
+    document.getElementById('complete-overlay').classList.add('hidden');
+}
+
+window.closeResult = function() {
+    document.getElementById('result-overlay').classList.add('hidden');
+}
+
+// --- クイズ関連 ---
+window.checkQuiz = function() {
+    const answers = { q1: "correct", q2: "correct", q3: "correct", q4: "correct" };
+    let isAllCorrect = true;
+
+    for (let key in answers) {
+        const select = document.getElementById(key);
+        if (select.value === answers[key]) {
+            select.classList.add('correct-answer');
+            select.classList.remove('wrong-answer');
+        } else {
+            select.classList.add('wrong-answer');
+            select.classList.remove('correct-answer');
+            isAllCorrect = false;
+        }
+    }
+
+    if (isAllCorrect) {
+        alert("🎉 大正解！\nすべての謎が解けました！");
+        finishGame();
+    } else {
+        alert("不正解があります。もう一度考えてみよう！");
+    }
+}
+
+window.closeQuiz = function() {
+    document.getElementById('quiz-overlay').classList.add('hidden');
+}
+
+// --- ユーティリティ ---
+function setupHiddenReset() {
+    let clickCount = 0;
+    const title = document.querySelector('h1');
+    if(!title) return;
+    title.onclick = () => {
+        clickCount++;
+        if (clickCount >= 5) {
+            if(confirm("データをリセットしますか？")) {
+                localStorage.clear();
+                location.reload();
+            }
+            clickCount = 0;
+        }
+        setTimeout(() => clickCount = 0, 1000);
+    };
+}
+
+function checkFirstVisit() {
+    if (!localStorage.getItem('nfc_visited')) {
+        document.getElementById('intro-overlay').classList.remove('hidden');
+    }
+}
+
+window.closeIntro = function() {
+    document.getElementById('intro-overlay').classList.add('hidden');
+    localStorage.setItem('nfc_visited', 'true');
+    audioScan.play().then(() => audioScan.pause()).catch(e => {});
+}

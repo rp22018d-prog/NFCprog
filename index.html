@@ -10,24 +10,21 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
 </head>
 <body>
-    <h1>NFC システム</h1>
+    <h1>NFC コレクション</h1>
     
     <!-- スキャンボタン -->
     <button id="scanBtn">スキャン開始</button>
     <p id="status">ボタンを押してスキャンを開始してください</p>
 
-    <!-- ★変更：ここからメインエリア -->
+    <!-- メインエリア：スタンプ台とボタン -->
     <div class="main-display-area">
-        
-        <!-- ① 大きなスタンプ台（画像が重なる場所） -->
+        <!-- ① 大きなスタンプ台 -->
         <div id="stamp-stage">
-            <!-- ここに画像（imgタグ）がJavaScriptで追加されます -->
             <div class="placeholder-text">スタンプ台紙</div>
         </div>
 
         <!-- ② 1〜9のインジケーター（ヒント/解説用ボタン） -->
         <div class="indicator-container">
-            <!-- 1〜9のボタン -->
             <div class="indicator" id="box-1" data-id="1">1</div>
             <div class="indicator" id="box-2" data-id="2">2</div>
             <div class="indicator" id="box-3" data-id="3">3</div>
@@ -38,9 +35,7 @@
             <div class="indicator" id="box-8" data-id="8">8</div>
             <div class="indicator" id="box-9" data-id="9">9</div>
         </div>
-
     </div>
-    <!-- ★変更ここまで -->
 
     <!-- コンプリート後のボタン -->
     <div id="final-challenge-area" class="hidden" style="margin-top: 20px;">
@@ -53,7 +48,7 @@
         <button onclick="retireGame()" style="background:#555; font-size:12px;">リタイアして結果を見る</button>
     </div>
 
-    <!-- ここから下のオーバーレイ（ポップアップ）類はそのまま -->
+    <!-- 各種オーバーレイ画面 -->
     <div id="complete-overlay" class="overlay hidden">
         <div class="overlay-content">
             <h2>🎉 コンプリート！ 🎉</h2>
@@ -82,13 +77,8 @@
     <div id="result-overlay" class="overlay hidden">
         <div class="overlay-content">
             <h2>🏆 結果発表 🏆</h2>
-            <div class="result-stats">
-                <p>獲得数 <span id="res-count">0 / 9</span></p>
-                <p>タイム <span id="res-time">--:--</span></p>
-            </div>
-            <div id="res-rank">RANK</div>
-            <p id="res-comment">コメント</p>
-            <button onclick="closeResult()">閉じる</button>
+            <!-- JSで中身を書き換えます -->
+            <div id="result-content-area"></div>
         </div>
     </div>
 
@@ -122,6 +112,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=10"></script>
+    <script src="script.js?v=11"></script>
 </body>
 </html>

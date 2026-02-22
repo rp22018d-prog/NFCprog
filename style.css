@@ -80,14 +80,18 @@ button:disabled {
 
 /* 2. インジケーター（下のボタン群） */
 .indicator-container {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
     margin-top: 15px;
 }
 
 .indicator {
-    aspect-ratio: 1 / 1;
+    /* aspect-ratio: 1 / 1; */
+    width: 40px;
+    height: 40px;
+    
     background-color: #ddd;
     color: #555;
     border-radius: 50%;

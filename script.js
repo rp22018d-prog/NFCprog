@@ -72,8 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (text >= 1 && text <= 7) {
                         handleTagFound(text);
-                    } else if (hazureData[text]) {
-                        showHazure(text);
+                    } else if (text >= 8) {
+                        handleHazureRedirect(text);
                     } else {
                         statusMsg.textContent = "未対応: " + text;
                     }
@@ -199,21 +199,33 @@ function loadState() {
 }
 
 // --- はずれ演出 ---
-function showHazure(id) {
+function handleHazureRedirect(id){
     processingId = id;
+
+    // 1. ハズレ演出（音と振動）
     audioScan.currentTime = 0;
     audioScan.play().catch(e => {});
-    if (navigator.vibrate) navigator.vibrate(200);
+    if (navigator.vibrate) navigator.vibrate(500); // 長めにブブーッ！
 
-    const msg = hazureData[id] || "ハズレです";
-    document.getElementById('hazure-text').textContent = msg;
-    document.getElementById('hazure-overlay').classList.remove('hidden');
+    // 2. スタンプは押さない！
+    // 3. すぐに解説ページへ移動
+    window.location.href = `detail.html?id=${id}`;
 }
+// function showHazure(id) {
+//     processingId = id;
+//     audioScan.currentTime = 0;
+//     audioScan.play().catch(e => {});
+//     if (navigator.vibrate) navigator.vibrate(200);
 
-window.closeHazure = function() {
-    document.getElementById('hazure-overlay').classList.add('hidden');
-    processingId = null;
-}
+//     const msg = hazureData[id] || "ハズレです";
+//     document.getElementById('hazure-text').textContent = msg;
+//     document.getElementById('hazure-overlay').classList.remove('hidden');
+// }
+
+// window.closeHazure = function() {
+//     document.getElementById('hazure-overlay').classList.add('hidden');
+//     processingId = null;
+// }
 
 // --- ヒント表示 ---
 function showHint(id) {

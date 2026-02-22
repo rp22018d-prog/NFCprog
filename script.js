@@ -7,8 +7,8 @@ const hints = {
     5: "5番のヒント：自販機の横。",
     6: "6番のヒント：2階へ上がってすぐ。",
     7: "7番のヒント：ベンチの裏側。",
-    8: "8番のヒント：ポスターのところ。",
-    9: "9番のヒント：一番奥の部屋。",
+    // 8: "8番のヒント：ポスターのところ。",
+    // 9: "9番のヒント：一番奥の部屋。",
 };
 
 const hazureData = {
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // コンプリート状態ならボタン表示
     const collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
-    if (collected.length >= 9) {
+    if (collected.length >= 7) {
         document.getElementById('final-challenge-area').classList.remove('hidden');
     }
 
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     if (processingId === text) return;
 
-                    if (text >= 1 && text <= 9) {
+                    if (text >= 1 && text <= 7) {
                         handleTagFound(text);
                     } else if (hazureData[text]) {
                         showHazure(text);
@@ -113,7 +113,7 @@ function handleTagFound(id) {
 
         // コンプリート判定
         const collected = JSON.parse(localStorage.getItem('nfc_collection') || '[]');
-        if (collected.length >= 9) {
+        if (collected.length >= 7) {
             // ファンファーレ再生
             audioComplete.currentTime = 0; 
             audioComplete.play().catch(e => {});
@@ -162,7 +162,7 @@ function addStampImage(id) {
 
 // --- インジケーター設定 ---
 function setupIndicators() {
-    for (let i = 1; i <= 9; i++) {
+    for (let i = 1; i <= 7; i++) {
         const btn = document.getElementById(`box-${i}`);
         if(!btn) continue;
         btn.onclick = () => {
@@ -288,17 +288,17 @@ function showResult() {
     let comment = "次はもっと集めよう！";
     const count = collected.length;
 
-    if (count === 9) {
+    if (count === 7) {
         rank = "S";
         comment = "完璧です！伝説の探検家！";
         if (minutes < 10) { 
             rank = "SS";
             comment = "神速の探検家！！凄すぎる！";
         }
-    } else if (count >= 7) {
+    } else if (count >= 5) {
         rank = "A";
         comment = "素晴らしい成果です！";
-    } else if (count >= 4) {
+    } else if (count >= 2) {
         rank = "B";
         comment = "なかなかやりますね！";
     }
@@ -306,7 +306,7 @@ function showResult() {
     const contentBox = document.getElementById('result-content-area');
     contentBox.innerHTML = `
         <div class="result-stats">
-            <p>獲得数 <span>${count} / 9</span></p>
+            <p>獲得数 <span>${count} / 7</span></p>
             <p>タイム <span>${timeStr}</span></p>
         </div>
         <div id="res-rank" class="rank-${rank.toLowerCase()}">${rank}</div>

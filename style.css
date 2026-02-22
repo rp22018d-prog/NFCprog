@@ -81,7 +81,7 @@ button:disabled {
 /* 2. インジケーター（下のボタン群） */
 .indicator-container {
     display: grid;
-    grid-template-columns: repeat(9, 1fr);
+    grid-template-columns: repeat(7, 1fr);
     gap: 5px;
     margin-top: 15px;
 }
